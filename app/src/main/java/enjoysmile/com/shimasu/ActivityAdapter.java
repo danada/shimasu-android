@@ -49,8 +49,6 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     //provide a constructor
     public ActivityAdapter(String[] activityDataset) {
         mActivityDataset = activityDataset;
-
-
     }
 
     // create new views (used by layout manager)

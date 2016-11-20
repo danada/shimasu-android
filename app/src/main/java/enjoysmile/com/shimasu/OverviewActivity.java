@@ -1,15 +1,16 @@
 package enjoysmile.com.shimasu;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 public class OverviewActivity extends AppCompatActivity {
 
@@ -24,15 +25,6 @@ public class OverviewActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         // recycler view
         mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
 
@@ -41,9 +33,23 @@ public class OverviewActivity extends AppCompatActivity {
         mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
 
         // specify an adapter
-        String[] activityDataset = {"Beer", "Push Ups", "Sit Ups", "test"};
+        final String[] activityDataset = {"Beer", "Push Ups", "Sit Ups", "test"};
         mActivityAdapter = new ActivityAdapter(activityDataset);
         mActivityRecyclerView.setAdapter(mActivityAdapter);
+
+        // mess around with fab
+        FloatingActionButton actionC = new FloatingActionButton(getBaseContext()); // new button
+        actionC.setTitle("Beer");
+        actionC.setIcon(R.drawable.ic_local_bar_white_24dp);
+        actionC.setSize(FloatingActionButton.SIZE_MINI);
+        actionC.setColorNormalResId(R.color.colorAccent);
+        actionC.setColorPressedResId(R.color.colorAccentDark);
+
+        // find the menu
+        final FloatingActionsMenu menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
+
+        // add the button
+        menuMultipleActions.addButton(actionC);
     }
 
     @Override
