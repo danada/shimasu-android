@@ -32,18 +32,19 @@
                 <TextView
                     android:id="@+id/point_total"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                     android:textColor="@android:color/white"
-                    android:layout_marginTop="-24dp"
+                    android:layout_marginTop="36dp"
                     app:layout_collapseMode="pin"
                     android:gravity="center"
                     android:text="53"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/point_total"
-                    android:layout_alignBaseline="@+id/point_total"
+                    android:layout_below="@id/point_total"
+                    android:layout_alignLeft="@id/point_total"
+                    android:layout_alignRight="@id/point_total"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@android:color/white"
                     app:layout_collapseMode="pin"

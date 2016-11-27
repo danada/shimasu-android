@@ -11,16 +11,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by Daniel on 11/17/2016.
  */
 
 public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHolder> {
-    private String[] mActivityDataset;
+    private List<Activity> mActivityDataset;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
         private final ImageView activityIcon;
+        private final TextView activityIconText;
+        private final TextView textViewSubtitle;
+        private final TextView activityPointLabel;
 
         public ViewHolder(View v) {
             super(v);
@@ -35,6 +40,9 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
             textView = (TextView) v.findViewById(R.id.textView);
             activityIcon = (ImageView) v.findViewById(R.id.activity_icon);
+            activityIconText = (TextView) v.findViewById(R.id.activity_icon_text);
+            textViewSubtitle = (TextView) v.findViewById(R.id.textViewSubtitle);
+            activityPointLabel = (TextView) v.findViewById(R.id.activityPointLabel);
         }
 
         public TextView getTextView() {
@@ -44,10 +52,16 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         public ImageView getActivityIcon() {
             return activityIcon;
         }
+
+        public TextView getActivityIconText() { return activityIconText; }
+
+        public TextView getTextViewSubtitle() { return textViewSubtitle; }
+
+        public TextView getActivityPointLabel() { return activityPointLabel; }
     }
 
     //provide a constructor
-    public ActivityAdapter(String[] activityDataset) {
+    public ActivityAdapter(List<Activity> activityDataset) {
         mActivityDataset = activityDataset;
     }
 
@@ -64,12 +78,47 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        // get element from dataset at this position
-        // replace contents
-        TextView tv = holder.getTextView();
-        tv.setText(mActivityDataset[position]);
+        // get activity
+        Activity _activity = mActivityDataset.get(position);
 
-        if (mActivityDataset[position].equals("Beer") || position % 2 == 0) {
+        // activity name
+        TextView tv = holder.getTextView();
+        tv.setText(_activity.name);
+
+        TextView activityIconText = holder.getActivityIconText();
+        activityIconText.setText(_activity.name.substring(0, 1).toUpperCase());
+
+        TextView activityPointLabel = holder.getActivityPointLabel();
+
+        // set subtitle
+        TextView textViewSubtitle = holder.getTextViewSubtitle();
+        switch (_activity.name) {
+            case "Beer":
+                textViewSubtitle.setText("One pint × 2");
+                activityPointLabel.setText("▼ 2");
+                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
+                break;
+            case "Push Ups":
+                textViewSubtitle.setText("10 times × 3");
+                activityPointLabel.setText("▲ 3");
+                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
+
+                break;
+            case "Sit Ups":
+                textViewSubtitle.setText("10 times × 2");
+                activityPointLabel.setText("▲ 2");
+                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
+
+                break;
+            default:
+                textViewSubtitle.setText("During class");
+                activityPointLabel.setText("▼ 1");
+                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
+
+                break;
+        }
+
+        if (_activity.name.equals("Sit Ups") || _activity.name.equals("Push Ups")) {
             PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
             holder.getActivityIcon().setColorFilter(rewardFilter);
         } else {
@@ -80,6 +129,6 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mActivityDataset.length;
+        return mActivityDataset.size();
     }
 }

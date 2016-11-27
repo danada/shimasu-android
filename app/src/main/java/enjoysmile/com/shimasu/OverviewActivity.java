@@ -1,6 +1,12 @@
 package enjoysmile.com.shimasu;
 
+import android.app.ActivityManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +17,9 @@ import android.view.View;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OverviewActivity extends AppCompatActivity {
 
@@ -33,7 +42,15 @@ public class OverviewActivity extends AppCompatActivity {
         mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
 
         // specify an adapter
-        final String[] activityDataset = {"Beer", "Push Ups", "Sit Ups", "test"};
+        final String[] activities = {"Beer", "Push Ups", "Sit Ups", "Snack"};
+        List<Activity> activityDataset = new ArrayList<>();
+        for (int i = 0; i < 300; i++) {
+            String _name = activities[(int)(Math.random() * activities.length)];
+            int _points = 1;
+            Activity _activity = new Activity(_name, "", _points);
+            activityDataset.add(_activity);
+        }
+
         mActivityAdapter = new ActivityAdapter(activityDataset);
         mActivityRecyclerView.setAdapter(mActivityAdapter);
 
@@ -50,6 +67,16 @@ public class OverviewActivity extends AppCompatActivity {
 
         // add the button
         menuMultipleActions.addButton(actionC);
+
+
+        // set the title bar color for white text
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+            ActivityManager.TaskDescription taskDesc = new ActivityManager.TaskDescription(getString(R.string.app_name),
+                    bm,
+                    ContextCompat.getColor(this, R.color.colorPrimaryVeryDark));
+            setTaskDescription(taskDesc);
+        }
     }
 
     @Override
