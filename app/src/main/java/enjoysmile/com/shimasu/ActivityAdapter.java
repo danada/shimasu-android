@@ -18,7 +18,7 @@ import java.util.List;
  */
 
 public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHolder> {
-    private List<Activity> mActivityDataset;
+    private List<History> mActivityDataset;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
@@ -61,7 +61,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     }
 
     //provide a constructor
-    public ActivityAdapter(List<Activity> activityDataset) {
+    public ActivityAdapter(List<History> activityDataset) {
         mActivityDataset = activityDataset;
     }
 
@@ -72,58 +72,42 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_view, parent, false);
 
         // set margins, etc
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+        return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         // get activity
-        Activity _activity = mActivityDataset.get(position);
+        History _history = mActivityDataset.get(position);
 
         // activity name
         TextView tv = holder.getTextView();
-        tv.setText(_activity.name);
+        tv.setText(_history.activity.name);
 
         TextView activityIconText = holder.getActivityIconText();
-        activityIconText.setText(_activity.name.substring(0, 1).toUpperCase());
+        activityIconText.setText(_history.activity.name.substring(0, 1).toUpperCase());
 
         TextView activityPointLabel = holder.getActivityPointLabel();
 
         // set subtitle
         TextView textViewSubtitle = holder.getTextViewSubtitle();
-        switch (_activity.name) {
-            case "Beer":
-                textViewSubtitle.setText("One pint × 2");
-                activityPointLabel.setText("▼ 2");
+        textViewSubtitle.setText(_history.activity.description +
+                " × " +
+                _history.quantity);
+
+        switch (_history.activity.type) {
+            case R.integer.ACTIVITY_TYPE_REWARD:
+                activityPointLabel.setText("▼ " + _history.points);
                 activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
+                PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+                holder.getActivityIcon().setColorFilter(activityFilter);
                 break;
-            case "Push Ups":
-                textViewSubtitle.setText("10 times × 3");
-                activityPointLabel.setText("▲ 3");
+            case R.integer.ACTIVITY_TYPE_ACTIVITY:
+                activityPointLabel.setText("▲ " + _history.points);
                 activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
-
+                PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                holder.getActivityIcon().setColorFilter(rewardFilter);
                 break;
-            case "Sit Ups":
-                textViewSubtitle.setText("10 times × 2");
-                activityPointLabel.setText("▲ 2");
-                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
-
-                break;
-            default:
-                textViewSubtitle.setText("During class");
-                activityPointLabel.setText("▼ 1");
-                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
-
-                break;
-        }
-
-        if (_activity.name.equals("Sit Ups") || _activity.name.equals("Push Ups")) {
-            PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-            holder.getActivityIcon().setColorFilter(rewardFilter);
-        } else {
-            PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
-            holder.getActivityIcon().setColorFilter(activityFilter);
         }
     }
 
