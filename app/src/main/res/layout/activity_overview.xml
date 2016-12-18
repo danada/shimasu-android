@@ -72,42 +72,18 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <RelativeLayout
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/multiple_actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp">
-        <com.getbase.floatingactionbutton.FloatingActionsMenu
-            android:id="@+id/multiple_actions"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            fab:fab_addButtonColorNormal="@color/colorAccent"
-            fab:fab_addButtonColorPressed="@color/colorAccentDark"
-            fab:fab_addButtonPlusIconColor="@android:color/white"
-            fab:fab_labelStyle="@style/menu_labels_style">
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/action_a"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_size="mini"
-                fab:fab_colorNormal="@android:color/white"
-                fab:fab_title="Push Ups"
-                fab:fab_colorPressed="@android:color/white"/>
-
-            <com.getbase.floatingactionbutton.FloatingActionButton
-                android:id="@+id/action_b"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                fab:fab_size="mini"
-                fab:fab_colorNormal="@android:color/white"
-                fab:fab_title="Sit Ups"
-                fab:fab_colorPressed="@android:color/white"/>
-
-        </com.getbase.floatingactionbutton.FloatingActionsMenu>
-    </RelativeLayout>
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        fab:menu_labels_style="@style/menu_labels_style"
+        fab:menu_colorNormal="@color/colorPrimary"
+        fab:menu_colorPressed="@color/colorPrimaryVeryDark"
+        fab:menu_colorRipple="@color/colorPrimaryDark">
+    </com.github.clans.fab.FloatingActionMenu>
 
 
 

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Shimasu</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_activity_manage">Manage Activities</string>
+    <string name="title_activity_manage">Manage Activities</string>
 </resources>

@@ -1,9 +1,9 @@
 package enjoysmile.com.shimasu;
 
 import android.app.ActivityManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -11,13 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,18 +94,18 @@ public class OverviewActivity extends AppCompatActivity {
                     _a.points * _q));
         }
 
-        mActivityAdapter = new ActivityAdapter(historyData);
+        mActivityAdapter = new HistoryAdapter(historyData);
         mActivityRecyclerView.setAdapter(mActivityAdapter);
 
 
         // build floating action menu
-        final FloatingActionsMenu menuMultipleActions = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
+        final FloatingActionMenu menuMultipleActions = (FloatingActionMenu) findViewById(R.id.multiple_actions);
 
         for (int i = 0; i < activities.size(); i++) {
             FloatingActionButton _fab = new FloatingActionButton(getBaseContext()); // new button
-            _fab.setTitle(activities.get(i).name);
-            _fab.setIcon(R.drawable.ic_local_bar_white_24dp);
-            _fab.setSize(FloatingActionButton.SIZE_MINI);
+            _fab.setLabelText(activities.get(i).name);
+            _fab.setImageResource(R.drawable.ic_local_bar_white_24dp);
+            _fab.setButtonSize(FloatingActionButton.SIZE_MINI);
             if (activities.get(i).type == R.integer.ACTIVITY_TYPE_REWARD) {
                 _fab.setColorNormalResId(R.color.colorAccent);
                 _fab.setColorPressedResId(R.color.colorAccentDark);
@@ -117,8 +115,25 @@ public class OverviewActivity extends AppCompatActivity {
             }
 
             // add the button
-            menuMultipleActions.addButton(_fab);
+            menuMultipleActions.addMenuButton(_fab);
         }
+
+        // hide and show the floating menu
+        mActivityRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy) {
+                if (dy > 0) {
+                    menuMultipleActions.hideMenuButton(true);
+                } else {
+                    menuMultipleActions.showMenuButton(true);
+                }
+                super.onScrolled(view, dx, dy);
+            }
+        });
 
 
         // set the title bar color for white text
@@ -145,8 +160,9 @@ public class OverviewActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_activity_manage) {
+            Intent intent = new Intent(this, ActivityManageActivity.class);
+            this.startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
