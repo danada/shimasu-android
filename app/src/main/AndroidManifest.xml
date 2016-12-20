@@ -27,6 +27,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="enjoysmile.com.shimasu.OverviewActivity"/>
         </activity>
+        <activity
+            android:name=".ActivityAddActivity"
+            android:label="@string/title_activity_add"
+            android:parentActivityName=".ActivityManageActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="enjoysmile.com.shimasu.ActivityManageActivity"/>
+        </activity>
     </application>
 
 </manifest>

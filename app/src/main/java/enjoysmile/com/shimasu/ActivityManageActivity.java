@@ -1,6 +1,7 @@
 package enjoysmile.com.shimasu;
 
 import android.app.ActivityManager;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -17,6 +18,8 @@ import com.github.clans.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.R.attr.onClick;
 
 public class ActivityManageActivity extends AppCompatActivity {
     private RecyclerView mActivityRecyclerView;
@@ -76,6 +79,16 @@ public class ActivityManageActivity extends AppCompatActivity {
 
         mActivityAdapter = new ActivityAdapter(activities);
         mActivityRecyclerView.setAdapter(mActivityAdapter);
+
+        // bind add button
+        final FloatingActionButton addActivityButton = (FloatingActionButton) findViewById(R.id.add_activity_button);
+        addActivityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ActivityAddActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
         // set the title bar color for white text

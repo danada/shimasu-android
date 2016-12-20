@@ -2,4 +2,10 @@
     <string name="app_name">Shimasu</string>
     <string name="action_activity_manage">Manage Activities</string>
     <string name="title_activity_manage">Manage Activities</string>
+    <string name="title_activity_add">Add Activity</string>
+
+    <string-array name="activity_Types">
+        <item>Activity</item>
+        <item>Reward</item>
+    </string-array>
 </resources>
