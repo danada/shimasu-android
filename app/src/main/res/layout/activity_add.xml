@@ -23,45 +23,100 @@
                 android:background="?attr/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="72dp"
+                android:paddingRight="16dp"
+                android:theme="@style/AddActivityHeaderInput">
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="45sp"
+                    android:hint="Name"/>
+            </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="72dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="32dp"
+                android:layout_marginTop="48dp"
+                android:theme="@style/AddActivityHeaderInput">
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:hint="Description"/>
+            </android.support.design.widget.TextInputLayout>
+
         </android.support.design.widget.AppBarLayout>
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="16dp"
-                android:paddingStart="16dp"
-                android:paddingRight="16dp"
-                android:paddingEnd="16dp"
                 android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:gravity="center_vertical"
-                    android:fontFamily="sans-serif-medium"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorPrimary"
-                    android:text="Activity Name"/>
-                <EditText
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:hint="Push Ups"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:gravity="center_vertical"
-                    android:fontFamily="sans-serif-medium"
-                    android:textSize="14sp"
-                    android:textColor="@color/colorPrimary"
-                    android:text="Activity Type"/>
-                <Spinner
-                    android:id="@+id/activity_type_spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:orientation="horizontal">
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="16dp"
+                            android:src="@drawable/ic_label_black_24px"/>
+                        <Spinner
+                            android:id="@+id/activity_type_spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="72dp"/>
+                    </RelativeLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="72dp">
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="16dp"
+                            android:layout_centerVertical="true"
+                            android:src="@drawable/ic_swap_vert_black_24px"/>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:orientation="vertical">
+                            <TextView
+                                android:id="@+id/point_amount_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#E7000000"
+                                android:paddingLeft="72dp"
+                                android:text="1 point"/>
+                            <TextView
+                                android:id="@+id/point_repeat_label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="#61000000"
+                                android:textSize="14sp"
+                                android:paddingLeft="72dp"
+                                android:text="Can repeat"/>
+                        </LinearLayout>
+
+                    </RelativeLayout>
+                </LinearLayout>
             </LinearLayout>
 
         </ScrollView>

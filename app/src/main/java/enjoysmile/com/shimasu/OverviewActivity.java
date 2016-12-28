@@ -20,6 +20,10 @@ import com.github.clans.fab.FloatingActionMenu;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
+
 public class OverviewActivity extends AppCompatActivity {
 
     private RecyclerView mActivityRecyclerView;
@@ -32,33 +36,44 @@ public class OverviewActivity extends AppCompatActivity {
     private List<Activity> activities; // later, seed from database
 
     protected void seedActivities() {
-        activities = new ArrayList<>();
+        Realm.init(getApplicationContext());
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+
+        // clear all activities
+        realm.delete(Activity.class);
+
+        RealmList _a = new RealmList<>();
 
         // beer
-        activities.add(new Activity(activities.size() + 1,
+        _a.add(new Activity(_a.size() + 1,
                 "Beer",
                 "One pint",
                 R.integer.ACTIVITY_TYPE_REWARD,
                 10));
         // snack
-        activities.add(new Activity(activities.size() + 1,
+        _a.add(new Activity(_a.size() + 1,
                 "Snack",
                 "Snack during class",
                 R.integer.ACTIVITY_TYPE_REWARD,
                 10));
 
         // push ups
-        activities.add(new Activity(activities.size() + 1,
+        _a.add(new Activity(_a.size() + 1,
                 "Push Ups",
                 "10 times",
                 R.integer.ACTIVITY_TYPE_ACTIVITY,
                 1));
         // sit ups
-        activities.add(new Activity(activities.size() + 1,
+        _a.add(new Activity(_a.size() + 1,
                 "Sit Ups",
                 "10 times",
                 R.integer.ACTIVITY_TYPE_ACTIVITY,
                 1));
+
+        realm.copyToRealm(_a);
+        realm.commitTransaction();
+        realm.close();
     }
 
     @Override
@@ -77,6 +92,13 @@ public class OverviewActivity extends AppCompatActivity {
 
         // seed activities
         seedActivities();
+
+        // get activities
+        Realm.init(getApplicationContext());
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Activity> _results = realm.where(Activity.class).findAll();
+        activities = realm.copyFromRealm(_results);
+        realm.close();
 
         // build the history list
         historyData = new ArrayList<>();

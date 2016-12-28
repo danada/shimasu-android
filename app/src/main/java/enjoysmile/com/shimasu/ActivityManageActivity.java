@@ -19,6 +19,11 @@ import com.github.clans.fab.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmResults;
+import io.realm.Sort;
+
 import static android.R.attr.onClick;
 
 public class ActivityManageActivity extends AppCompatActivity {
@@ -26,39 +31,7 @@ public class ActivityManageActivity extends AppCompatActivity {
     private RecyclerView.Adapter mActivityAdapter;
     private RecyclerView.LayoutManager mActivityLayoutManager;
 
-
     private List<Activity> activities;
-
-
-    protected void seedActivities() {
-        activities = new ArrayList<>();
-
-        // beer
-        activities.add(new Activity(activities.size() + 1,
-                "Beer",
-                "One pint",
-                R.integer.ACTIVITY_TYPE_REWARD,
-                10));
-        // snack
-        activities.add(new Activity(activities.size() + 1,
-                "Snack",
-                "Snack during class",
-                R.integer.ACTIVITY_TYPE_REWARD,
-                10));
-
-        // push ups
-        activities.add(new Activity(activities.size() + 1,
-                "Push Ups",
-                "10 times",
-                R.integer.ACTIVITY_TYPE_ACTIVITY,
-                1));
-        // sit ups
-        activities.add(new Activity(activities.size() + 1,
-                "Sit Ups",
-                "10 times",
-                R.integer.ACTIVITY_TYPE_ACTIVITY,
-                1));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +41,15 @@ public class ActivityManageActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // seed activities
-        seedActivities();
+        // get
+        Realm.init(getApplicationContext());
+        Realm realm = Realm.getDefaultInstance();
+        // get activities, order by type
+        RealmResults<Activity> _a = realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
+        activities = realm.copyFromRealm(_a);
+        realm.close();
+
+
 
         mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
 
