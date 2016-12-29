@@ -56,39 +56,23 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             for (int i = 0; i < activities.size(); i++) {
                 // first header
                 if (i == 0) {
-                    String _type = new String();
-                    if (activities.get(i).type == R.integer.ACTIVITY_TYPE_REWARD) {
-                        _type = "Rewards";
-                    } else if (activities.get(i).type == R.integer.ACTIVITY_TYPE_ACTIVITY) {
-                        _type = "Activities";
-                    }
-
                     // add reward header
                     activities.add(0, new Activity(-1,
-                            _type,
+                            null,
                             "",
-                            -1,
+                            activities.get(i).type,
                             0));
-
-                    Log.d("ZERO HEADER", _type);
                 } else {
 
                     // second header (if necessary)
                     if (i + 1 < activities.size() &&
                             activities.get(i - 1).id != -1 && activities.get(i).id != -1 &&
                             (activities.get(i).type != activities.get(i + 1).type)) {
-                        String _type = new String();
-                        if (activities.get(i + 1).type == R.integer.ACTIVITY_TYPE_REWARD) {
-                            _type = "Rewards";
-                        } else if (activities.get(i + 1).type == R.integer.ACTIVITY_TYPE_ACTIVITY) {
-                            _type = "Activities";
-                        }
-
                         // add reward header
                         activities.add(i + 1, new Activity(-1,
-                                _type,
+                                null,
                                 "",
-                                -1,
+                                activities.get(i + 1).type,
                                 0));
                     }
                 }
@@ -102,12 +86,10 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         switch (viewType) {
             case -1: {
                 View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_subheading, parent, false);
-                Log.d("INFLATING", "SUBHEADING");
                 return new SubheadingViewHolder(v);
             }
             default: {
                 View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_view, parent, false);
-                Log.d("INFLATING", "ACTIVITY VIEW");
                 return new ViewHolder(v);
             }
         }
@@ -118,11 +100,13 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         //get activity
         Activity _activity = mActivities.get(position);
 
-        if (getItemViewType(position) == -1) {
+        if (getItemViewType(position) == -1) { // type row
             SubheadingViewHolder holder = (SubheadingViewHolder) h;
             TextView subheadingLabel = holder.getSubheadingLabel();
-            subheadingLabel.setText(_activity.name);
-        } else {
+            // get activity type string from ID
+            String[] activity_types = subheadingLabel.getResources().getStringArray(R.array.activity_types);
+            subheadingLabel.setText(activity_types[_activity.type]);
+        } else { // activity row
             ViewHolder holder = (ViewHolder) h;
             // activity label
             TextView activityLabel = holder.getActivityLabel();
@@ -135,15 +119,15 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             // activity points
             TextView activityPointLabel = holder.getActivityPointLabel();
 
-            switch (_activity.type) {
-                case R.integer.ACTIVITY_TYPE_REWARD:
-                    activityPointLabel.setText("▼ " + _activity.points);
-                    activityPointLabel.setTextColor(ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointDown));
-                    break;
-                case R.integer.ACTIVITY_TYPE_ACTIVITY:
-                    activityPointLabel.setText("▲ " + _activity.points);
-                    activityPointLabel.setTextColor(ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointUp));
-                    break;
+            final int ACTIVITY_TYPE_REWARD = activityPointLabel.getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
+            final int ACTIVITY_TYPE_ACTIVITY = activityPointLabel.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
+
+            if (_activity.type == ACTIVITY_TYPE_REWARD) {
+                activityPointLabel.setText("▼ " + _activity.points);
+                activityPointLabel.setTextColor(ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointDown));
+            } else if (_activity.type == ACTIVITY_TYPE_ACTIVITY) {
+                activityPointLabel.setText("▲ " + _activity.points);
+                activityPointLabel.setTextColor(ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointUp));
             }
         }
     }

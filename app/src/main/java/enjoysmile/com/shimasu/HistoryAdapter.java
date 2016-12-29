@@ -89,25 +89,27 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         TextView activityPointLabel = holder.getActivityPointLabel();
 
+
+
         // set subtitle
         TextView textViewSubtitle = holder.getTextViewSubtitle();
         textViewSubtitle.setText(_history.activity.description +
                 " × " +
                 _history.quantity);
 
-        switch (_history.activity.type) {
-            case R.integer.ACTIVITY_TYPE_REWARD:
-                activityPointLabel.setText("▼ " + _history.points);
-                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
-                PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
-                holder.getActivityIcon().setColorFilter(activityFilter);
-                break;
-            case R.integer.ACTIVITY_TYPE_ACTIVITY:
-                activityPointLabel.setText("▲ " + _history.points);
-                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
-                PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-                holder.getActivityIcon().setColorFilter(rewardFilter);
-                break;
+        final int ACTIVITY_TYPE_REWARD = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
+        final int ACTIVITY_TYPE_ACTIVITY = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
+
+        if (_history.activity.type == ACTIVITY_TYPE_REWARD) {
+            activityPointLabel.setText("▼ " + _history.points);
+            activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
+            PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+            holder.getActivityIcon().setColorFilter(activityFilter);
+        } else if (_history.activity.type == ACTIVITY_TYPE_ACTIVITY) {
+            activityPointLabel.setText("▲ " + _history.points);
+            activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
+            PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+            holder.getActivityIcon().setColorFilter(rewardFilter);
         }
     }
 

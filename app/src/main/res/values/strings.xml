@@ -3,9 +3,19 @@
     <string name="action_activity_manage">Manage Activities</string>
     <string name="title_activity_manage">Manage Activities</string>
     <string name="title_activity_add">Add Activity</string>
+    <string name="point">point</string>
+    <string name="point_plural">points</string>
 
-    <string-array name="activity_Types">
+    <string-array name="activity_types">
         <item>Activity</item>
         <item>Reward</item>
+    </string-array>
+    <string-array name="activity_types_description">
+        <item>Earns points</item>
+        <item>Consumes points</item>
+    </string-array>
+    <string-array name="repeatable_description">
+        <item>Once daily</item>
+        <item>Can repeat</item>
     </string-array>
 </resources>

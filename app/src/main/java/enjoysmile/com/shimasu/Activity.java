@@ -12,6 +12,7 @@ public class Activity extends RealmObject {
     public String description;
     public int type;
     public int points;
+    // TODO repeatable boolean
 
     public Activity() {
 

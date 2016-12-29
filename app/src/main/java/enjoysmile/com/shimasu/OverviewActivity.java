@@ -49,26 +49,26 @@ public class OverviewActivity extends AppCompatActivity {
         _a.add(new Activity(_a.size() + 1,
                 "Beer",
                 "One pint",
-                R.integer.ACTIVITY_TYPE_REWARD,
+                getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD),
                 10));
         // snack
         _a.add(new Activity(_a.size() + 1,
                 "Snack",
                 "Snack during class",
-                R.integer.ACTIVITY_TYPE_REWARD,
+                getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD),
                 10));
 
         // push ups
         _a.add(new Activity(_a.size() + 1,
                 "Push Ups",
                 "10 times",
-                R.integer.ACTIVITY_TYPE_ACTIVITY,
+                getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY),
                 1));
         // sit ups
         _a.add(new Activity(_a.size() + 1,
                 "Sit Ups",
                 "10 times",
-                R.integer.ACTIVITY_TYPE_ACTIVITY,
+                getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY),
                 1));
 
         realm.copyToRealm(_a);
@@ -128,7 +128,7 @@ public class OverviewActivity extends AppCompatActivity {
             _fab.setLabelText(activities.get(i).name);
             _fab.setImageResource(R.drawable.ic_local_bar_white_24dp);
             _fab.setButtonSize(FloatingActionButton.SIZE_MINI);
-            if (activities.get(i).type == R.integer.ACTIVITY_TYPE_REWARD) {
+            if (activities.get(i).type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
                 _fab.setColorNormalResId(R.color.colorAccent);
                 _fab.setColorPressedResId(R.color.colorAccentDark);
             } else {

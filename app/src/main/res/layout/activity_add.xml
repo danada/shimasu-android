@@ -30,9 +30,10 @@
                 android:paddingRight="16dp"
                 android:theme="@style/AddActivityHeaderInput">
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/activity_add_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="45sp"
+                    android:textSize="34sp"
                     android:hint="Name"/>
             </android.support.design.widget.TextInputLayout>
             <android.support.design.widget.TextInputLayout
@@ -41,12 +42,13 @@
                 android:paddingLeft="72dp"
                 android:paddingRight="16dp"
                 android:paddingBottom="32dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="26dp"
                 android:theme="@style/AddActivityHeaderInput">
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/activity_add_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="24sp"
+                    android:textSize="16sp"
                     android:hint="Description"/>
             </android.support.design.widget.TextInputLayout>
 
@@ -54,12 +56,12 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingTop="8dp"
                 android:orientation="vertical">
 
                 <!-- Activity type -->
@@ -87,16 +89,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#E7000000"
-                                android:paddingLeft="72dp"
-                                android:text="Reward"/>
+                                android:paddingLeft="72dp"/>
                             <TextView
                                 android:id="@+id/activity_type_subtitle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#61000000"
                                 android:textSize="14sp"
-                                android:paddingLeft="72dp"
-                                android:text="Consumes points"/>
+                                android:paddingLeft="72dp"/>
                         </LinearLayout>
 
                     </RelativeLayout>
@@ -104,6 +104,7 @@
 
                 <!-- Activity points -->
                 <LinearLayout
+                    android:id="@+id/activity_point_selector"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -126,16 +127,14 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#E7000000"
-                                android:paddingLeft="72dp"
-                                android:text="1 point"/>
+                                android:paddingLeft="72dp"/>
                             <TextView
                                 android:id="@+id/point_repeat_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="#61000000"
                                 android:textSize="14sp"
-                                android:paddingLeft="72dp"
-                                android:text="Can repeat"/>
+                                android:paddingLeft="72dp"/>
                         </LinearLayout>
 
                     </RelativeLayout>

@@ -49,8 +49,6 @@ public class ActivityManageActivity extends AppCompatActivity {
         activities = realm.copyFromRealm(_a);
         realm.close();
 
-
-
         mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
 
         // use a linear layout manager
@@ -65,6 +63,7 @@ public class ActivityManageActivity extends AppCompatActivity {
         addActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // TODO - startActivityForResult to get notified of addition
                 Intent intent = new Intent(getApplicationContext(), ActivityAddActivity.class);
                 startActivity(intent);
             }
