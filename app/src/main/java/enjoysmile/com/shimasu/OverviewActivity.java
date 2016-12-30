@@ -31,9 +31,7 @@ public class OverviewActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mActivityLayoutManager;
 
     private List<History> historyData;
-
-
-    private List<Activity> activities; // later, seed from database
+    private List<Activity> activities; // seed from database
 
     protected void seedActivities() {
         Realm.init(getApplicationContext());
@@ -50,26 +48,30 @@ public class OverviewActivity extends AppCompatActivity {
                 "Beer",
                 "One pint",
                 getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD),
-                10));
+                10,
+                true));
         // snack
         _a.add(new Activity(_a.size() + 1,
                 "Snack",
                 "Snack during class",
                 getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD),
-                10));
+                10,
+                true));
 
         // push ups
         _a.add(new Activity(_a.size() + 1,
                 "Push Ups",
                 "10 times",
                 getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY),
-                1));
+                1,
+                true));
         // sit ups
         _a.add(new Activity(_a.size() + 1,
                 "Sit Ups",
                 "10 times",
                 getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY),
-                1));
+                1,
+                true));
 
         realm.copyToRealm(_a);
         realm.commitTransaction();
@@ -170,16 +172,12 @@ public class OverviewActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_overview, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if (id == R.id.action_activity_manage) {

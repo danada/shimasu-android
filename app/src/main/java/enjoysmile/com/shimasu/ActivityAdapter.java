@@ -1,5 +1,6 @@
 package enjoysmile.com.shimasu;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +27,22 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public ViewHolder(View v) {
             super(v);
+
+            // Define click listener for the ViewHolder's View.
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // start edit intent
+                    Intent intent = new Intent(v.getContext(), ActivityAddActivity.class);
+                    // set edit mode flag
+                    intent.putExtra("edit_mode", true);
+                    // set activity id
+                    intent.putExtra("activity_id", mActivities.get(getAdapterPosition()).id);
+                    // start the activity
+                    v.getContext().startActivity(intent);
+
+                }
+            });
 
             activityLabel = (TextView) v.findViewById(R.id.activityLabel);
             activitySubtitle = (TextView) v.findViewById(R.id.activitySubtitle);
@@ -61,7 +78,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             null,
                             "",
                             activities.get(i).type,
-                            0));
+                            0,
+                            false));
                 } else {
 
                     // second header (if necessary)
@@ -73,7 +91,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                                 null,
                                 "",
                                 activities.get(i + 1).type,
-                                0));
+                                0,
+                                false));
                     }
                 }
             }

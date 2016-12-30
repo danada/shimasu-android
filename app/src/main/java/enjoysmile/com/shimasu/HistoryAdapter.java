@@ -89,8 +89,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         TextView activityPointLabel = holder.getActivityPointLabel();
 
-
-
         // set subtitle
         TextView textViewSubtitle = holder.getTextViewSubtitle();
         textViewSubtitle.setText(_history.activity.description +
