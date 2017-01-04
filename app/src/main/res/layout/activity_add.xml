@@ -42,7 +42,7 @@
                 android:paddingLeft="72dp"
                 android:paddingRight="16dp"
                 android:paddingBottom="32dp"
-                android:layout_marginTop="26dp"
+                android:paddingTop="26dp"
                 android:theme="@style/AddActivityHeaderInput">
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/activity_add_description"

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -28,7 +29,7 @@ import static android.R.attr.onClick;
 
 public class ActivityManageActivity extends AppCompatActivity {
     private RecyclerView mActivityRecyclerView;
-    private RecyclerView.Adapter mActivityAdapter;
+    private ActivityAdapter mActivityAdapter;
     private RecyclerView.LayoutManager mActivityLayoutManager;
 
     private List<Activity> activities;
@@ -63,9 +64,8 @@ public class ActivityManageActivity extends AppCompatActivity {
         addActivityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO - startActivityForResult to get notified of addition
                 Intent intent = new Intent(getApplicationContext(), ActivityAddActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, getResources().getInteger(R.integer.ADD_ACTIVITY_REQUEST));
             }
         });
 
@@ -77,6 +77,22 @@ public class ActivityManageActivity extends AppCompatActivity {
                     bm,
                     ContextCompat.getColor(this, R.color.colorPrimaryVeryDark));
             setTaskDescription(taskDesc);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == getResources().getInteger(R.integer.ADD_ACTIVITY_REQUEST) ||
+                requestCode == getResources().getInteger(R.integer.EDIT_ACTIVITY_REQUEST)) {
+            // get
+            Realm.init(getApplicationContext());
+            Realm realm = Realm.getDefaultInstance();
+            // get activities, order by type
+            RealmResults<Activity> _a = realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
+            activities = realm.copyFromRealm(_a);
+            realm.close();
+            mActivityAdapter.updateAdapter(activities);
         }
     }
 

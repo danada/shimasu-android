@@ -251,13 +251,15 @@ public class ActivityAddActivity extends AppCompatActivity {
                 realm.copyToRealmOrUpdate(toReplace);
             } else {
                 // new object, we need to get a new ID
-                activity.id = realm.where(Activity.class).count();
+                activity.id = realm.where(Activity.class).count() + 1;
                 realm.copyToRealm(activity);
             }
 
             realm.commitTransaction();
             realm.close();
 
+            Intent returnIntent = new Intent();
+            setResult(getResources().getInteger(R.integer.ADD_ACTIVITY_REQUEST), returnIntent);
             finish();
         }
         return super.onOptionsItemSelected(item);

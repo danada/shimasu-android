@@ -1,5 +1,6 @@
 package enjoysmile.com.shimasu;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -39,8 +40,8 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     // set activity id
                     intent.putExtra("activity_id", mActivities.get(getAdapterPosition()).id);
                     // start the activity
-                    v.getContext().startActivity(intent);
-
+                    ((android.app.Activity) v.getContext()).startActivityForResult(intent,
+                            v.getContext().getResources().getInteger(R.integer.EDIT_ACTIVITY_REQUEST));
                 }
             });
 
@@ -68,36 +69,40 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     // constructor
     public ActivityAdapter(List<Activity> activities) {
-        if (activities.size() > 0) {
+        mActivities = activities;
+
+        buildHeaders();
+    }
+
+    private void buildHeaders() {
+        if (mActivities.size() > 0) {
             // add type divider
-            for (int i = 0; i < activities.size(); i++) {
+            for (int i = 0; i < mActivities.size(); i++) {
                 // first header
                 if (i == 0) {
                     // add reward header
-                    activities.add(0, new Activity(-1,
+                    mActivities.add(0, new Activity(-1,
                             null,
                             "",
-                            activities.get(i).type,
+                            mActivities.get(i).type,
                             0,
                             false));
                 } else {
-
                     // second header (if necessary)
-                    if (i + 1 < activities.size() &&
-                            activities.get(i - 1).id != -1 && activities.get(i).id != -1 &&
-                            (activities.get(i).type != activities.get(i + 1).type)) {
+                    if (i < mActivities.size() && // if there's another activity after this
+                            mActivities.get(i - 1).id != -1 && mActivities.get(i).id != -1 && // if the last or current row not header
+                            (mActivities.get(i).type != mActivities.get(i - 1).type)) { // if this type doesn't equal previous type
                         // add reward header
-                        activities.add(i + 1, new Activity(-1,
+                        mActivities.add(i, new Activity(-1,
                                 null,
                                 "",
-                                activities.get(i + 1).type,
+                                mActivities.get(i).type,
                                 0,
                                 false));
                     }
                 }
             }
         }
-        mActivities = activities;
     }
 
     @Override
@@ -162,4 +167,11 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() { return mActivities.size(); }
+
+    public void updateAdapter(List<Activity> activities) {
+        this.mActivities = activities;
+
+        buildHeaders();
+        notifyDataSetChanged();
+    }
 }

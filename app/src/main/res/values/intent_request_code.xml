@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="ADD_ACTIVITY_REQUEST">0</integer>
+    <integer name="EDIT_ACTIVITY_REQUEST">1</integer>
+</resources>
