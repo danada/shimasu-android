@@ -82,29 +82,29 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         // activity name
         TextView tv = holder.getTextView();
-        tv.setText(_history.activity.name);
+        tv.setText(_history.getActivity().name);
 
         TextView activityIconText = holder.getActivityIconText();
-        activityIconText.setText(_history.activity.name.substring(0, 1).toUpperCase());
+        activityIconText.setText(_history.getActivity().name.substring(0, 1).toUpperCase());
 
         TextView activityPointLabel = holder.getActivityPointLabel();
 
         // set subtitle
         TextView textViewSubtitle = holder.getTextViewSubtitle();
-        textViewSubtitle.setText(_history.activity.description +
+        textViewSubtitle.setText(_history.getActivity().description +
                 " × " +
-                _history.quantity);
+                _history.getQuantity());
 
         final int ACTIVITY_TYPE_REWARD = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
         final int ACTIVITY_TYPE_ACTIVITY = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
 
-        if (_history.activity.type == ACTIVITY_TYPE_REWARD) {
-            activityPointLabel.setText("▼ " + _history.points);
+        if (_history.getActivity().type == ACTIVITY_TYPE_REWARD) {
+            activityPointLabel.setText("▼ " + _history.getPoints());
             activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
             PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
             holder.getActivityIcon().setColorFilter(activityFilter);
-        } else if (_history.activity.type == ACTIVITY_TYPE_ACTIVITY) {
-            activityPointLabel.setText("▲ " + _history.points);
+        } else if (_history.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
+            activityPointLabel.setText("▲ " + _history.getPoints());
             activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
             PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
             holder.getActivityIcon().setColorFilter(rewardFilter);
@@ -114,5 +114,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @Override
     public int getItemCount() {
         return mActivityDataset.size();
+    }
+
+    public void updateAdapter(List<History> history) {
+        this.mActivityDataset = history;
+        notifyDataSetChanged();
     }
 }
