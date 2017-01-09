@@ -1,6 +1,7 @@
 package enjoysmile.com.shimasu;
 
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,8 +21,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -37,19 +35,20 @@ import java.util.Locale;
 import java.util.UUID;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import io.realm.exceptions.RealmMigrationNeededException;
 
 public class OverviewActivity extends AppCompatActivity {
 
-    private RecyclerView mActivityRecyclerView;
     private HistoryAdapter mActivityAdapter;
-    private RecyclerView.LayoutManager mActivityLayoutManager;
 
     private RealmList<History> historyData;
-    private RealmList<Activity> activities; // seed from database
+    private RealmList<Activity> activities;
 
+    private User mUser;
     private Realm realm;
 
     @Override
@@ -59,16 +58,23 @@ public class OverviewActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // open realm
-        Realm.init(getApplicationContext());
-        realm = Realm.getDefaultInstance();
-
         // recycler view
-        mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
+        RecyclerView mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
 
         // use a linear layout manager
-        mActivityLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
         mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
+
+        // open realm
+        Realm.init(getApplicationContext());
+//        RealmConfiguration config = new RealmConfiguration.Builder()
+//                .deleteRealmIfMigrationNeeded()
+//                .build();
+//        realm = Realm.getInstance(config);
+        realm = Realm.getDefaultInstance();
+
+        // initiate user
+        mUser = initializeUser();
 
         // get activities
         RealmResults<Activity> activityResult = realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
@@ -81,6 +87,12 @@ public class OverviewActivity extends AppCompatActivity {
         historyData.addAll(historyResult.subList(0, historyResult.size()));
         mActivityAdapter = new HistoryAdapter(historyData);
         mActivityRecyclerView.setAdapter(mActivityAdapter);
+
+        // update the toolbar points
+        TextView pointTotal = (TextView) findViewById(R.id.point_total);
+        TextView pointSubtitle = (TextView) findViewById(R.id.point_subtitle);
+        pointTotal.setText(String.format(Locale.getDefault(), "%d", mUser.getPoints()));
+        pointSubtitle.setText(mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));
 
 
         // build floating action menu
@@ -129,6 +141,57 @@ public class OverviewActivity extends AppCompatActivity {
                     _historyToAdd.setPoints(activities.get(selectedIndex).points);
 
 
+
+
+                    builder.setView(dialogView)
+                            .setTitle("Log Activity")
+                            .setPositiveButton("Log", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // set the time
+                                    _historyToAdd.setDate(System.currentTimeMillis());
+
+                                    // copy to realm
+                                    realm.beginTransaction();
+                                    realm.copyToRealmOrUpdate(_historyToAdd);
+
+                                    // update user points
+                                    if (_historyToAdd.getActivity().type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
+                                        // subtract points
+                                        mUser.setPoints(mUser.getPoints() - _historyToAdd.getPoints());
+                                    } else {
+                                        // add points
+                                        mUser.setPoints(mUser.getPoints() + _historyToAdd.getPoints());
+                                    }
+                                    realm.copyToRealmOrUpdate(mUser);
+                                    realm.commitTransaction();
+
+                                    // update adapter
+                                    historyData.add(0, _historyToAdd);
+                                    mActivityAdapter.updateAdapter(historyData);
+
+                                    // update the toolbar
+                                    TextView pointTotal = (TextView) findViewById(R.id.point_total);
+                                    TextView pointSubtitle = (TextView) findViewById(R.id.point_subtitle);
+                                    pointTotal.setText(String.format(Locale.getDefault(), "%d", mUser.getPoints()));
+                                    pointSubtitle.setText(mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));
+
+                                    // close dialog
+                                    dialog.dismiss();
+
+                                    // close the floating action menu
+                                    menuMultipleActions.close(true);
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                    // show the dialog
+                    final AlertDialog dialog = builder.create();
+
                     View.OnClickListener amountButtonListener = new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -147,9 +210,30 @@ public class OverviewActivity extends AppCompatActivity {
                             // recalculate points
                             _historyToAdd.setPoints(_historyToAdd.getQuantity() * _historyToAdd.getActivity().points);
 
-                            // update label
+                            // update amount label
                             TextView amountLabel = (TextView) dialogView.findViewById(R.id.add_activity_amount_label);
                             amountLabel.setText(String.format(Locale.getDefault(), "%d", _historyToAdd.getQuantity()));
+
+                            // update points label
+                            final int ACTIVITY_TYPE_REWARD = getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
+                            final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
+                            TextView pointTotalLabel = (TextView) dialogView.findViewById(R.id.add_activity_point_total_label);
+
+                            if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+                                pointTotalLabel.setText("▼ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointDown));
+                            } else if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
+                                pointTotalLabel.setText("▲ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointUp));
+                            }
+
+                            // disable log button if not enough points
+                            if (_historyToAdd.getPoints() > mUser.getPoints() &&
+                                    _historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                            } else {
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                            }
                         }
                     };
 
@@ -171,6 +255,27 @@ public class OverviewActivity extends AppCompatActivity {
                         @Override
                         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                             _historyToAdd.setActivity(availableActivities.get(i));
+                            _historyToAdd.setPoints(_historyToAdd.getQuantity() * _historyToAdd.getActivity().points);
+                            // update points label
+                            final int ACTIVITY_TYPE_REWARD = getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
+                            final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
+                            TextView pointTotalLabel = (TextView) dialogView.findViewById(R.id.add_activity_point_total_label);
+
+                            if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+                                pointTotalLabel.setText("▼ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointDown));
+                            } else if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
+                                pointTotalLabel.setText("▲ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointUp));
+                            }
+
+                            // disable log button if not enough points
+                            if (_historyToAdd.getPoints() > mUser.getPoints() &&
+                                    _historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                            } else {
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                            }
                         }
 
                         @Override
@@ -179,39 +284,7 @@ public class OverviewActivity extends AppCompatActivity {
                         }
                     });
 
-
-                    builder.setView(dialogView)
-                            .setTitle("Log Activity")
-                            .setPositiveButton("Log", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    // set the time
-                                    _historyToAdd.setDate(System.currentTimeMillis());
-
-                                    // copy to realm
-                                    realm.beginTransaction();
-                                    realm.copyToRealmOrUpdate(_historyToAdd);
-                                    realm.commitTransaction();
-
-                                    // update adapter
-                                    historyData.add(0, _historyToAdd);
-                                    mActivityAdapter.updateAdapter(historyData);
-
-                                    // close dialog
-                                    dialog.dismiss();
-
-                                    // close the floating action menu
-                                    menuMultipleActions.close(true);
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.dismiss();
-                                }
-                            });
-
-                    // show the dialog
-                    builder.create().show();
+                    dialog.show();
                 }
             });
 
@@ -246,6 +319,27 @@ public class OverviewActivity extends AppCompatActivity {
                     ContextCompat.getColor(this, R.color.colorPrimaryVeryDark));
             setTaskDescription(taskDesc);
         }
+    }
+
+    protected User initializeUser() {
+        // get activities
+        RealmResults<User> userResults = realm.where(User.class).findAll();
+        if (userResults.size() < 1) {
+            // make a new user
+            realm.beginTransaction();
+            User newUser = new User();
+            newUser.setId(UUID.randomUUID().toString());
+            newUser.setPoints(0);
+            newUser.setLastUpdated(System.currentTimeMillis());
+            realm.copyToRealmOrUpdate(newUser);
+            realm.commitTransaction();
+
+            return newUser;
+        } else {
+            // return our current user
+            return userResults.first();
+        }
+
     }
 
     @Override

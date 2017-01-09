@@ -33,23 +33,22 @@
                     android:id="@+id/point_total"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
                     android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                     android:textColor="@android:color/white"
                     android:paddingTop="36dp"
                     app:layout_collapseMode="pin"
-                    android:gravity="center"
                     android:text="53"/>
                 <TextView
+                    android:id="@+id/point_subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/point_total"
-                    android:layout_alignLeft="@id/point_total"
-                    android:layout_alignRight="@id/point_total"
+                    android:layout_centerHorizontal="true"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textColor="@android:color/white"
                     app:layout_collapseMode="pin"
-                    android:text="points"
-                    android:gravity="center"/>
+                    android:text="points"/>
             </RelativeLayout>
 
 
