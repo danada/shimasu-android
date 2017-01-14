@@ -520,7 +520,7 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                             mActivityAdapter.notifyItemRemoved(0);
                         } else if (historyData.get(clickedItemPosition - 1).getActivity().type == -1 && // if sandwiched by dates
                                 historyData.size() > clickedItemPosition + 1 &&
-                                historyData.get(clickedItemPosition + 1).getActivity().type == -1) {
+                                historyData.get(clickedItemPosition).getActivity().type == -1) {
                             // remove the leading date object
                             historyData.remove(clickedItemPosition - 1);
                             mActivityAdapter.notifyItemRemoved(clickedItemPosition - 1);
