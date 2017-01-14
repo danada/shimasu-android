@@ -13,30 +13,33 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 /**
  * Created by Daniel on 11/17/2016.
  */
 
-public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
+public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<History> mActivityDataset;
+    private ItemClickedListener mItemClickedListener;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public interface ItemClickedListener {
+        void onHistoryItemClicked(int position);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView textView;
         private final ImageView activityIcon;
         private final TextView activityIconText;
         private final TextView textViewSubtitle;
         private final TextView activityPointLabel;
 
-        public ViewHolder(View v) {
+        private ViewHolder(View v) {
             super(v);
 
             // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("HISTORY_ADAPTER", "Element " + getAdapterPosition() + " clicked.");
-                }
-            });
+            v.setOnClickListener(this);
 
             textView = (TextView) v.findViewById(R.id.textView);
             activityIcon = (ImageView) v.findViewById(R.id.activity_icon);
@@ -45,69 +48,131 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             activityPointLabel = (TextView) v.findViewById(R.id.activityPointLabel);
         }
 
-        public TextView getTextView() {
+        @Override
+        public void onClick(View v) {
+            Log.d("HISTORY_ADAPTER", "Element " + getAdapterPosition() + " clicked.");
+mItemClickedListener.onHistoryItemClicked(getAdapterPosition());
+            // TODO - dialog to confirm
+
+            // history to remove
+//            //removeHistoryItem(mActivityDataset.get(getAdapterPosition()));
+//            History _historyToRemove = mActivityDataset.get(getAdapterPosition());
+//            mActivityDataset.remove(getAdapterPosition());
+//            notifyItemRemoved(getAdapterPosition());
+//
+//            Realm.init(v.getContext());
+//            Realm realm = Realm.getDefaultInstance();
+//            realm.beginTransaction();
+//            //RealmResults<History> _h = realm.where(History.class).equalTo("id", mActivityDataset.get(getAdapterPosition()).getId()).findAll();
+//            //_h.deleteFirstFromRealm();
+//            _historyToRemove.deleteFromRealm();
+//
+//            // TODO - remove points from user object
+//
+//            realm.commitTransaction();
+//            realm.close();
+        }
+
+        private TextView getTextView() {
             return textView;
         }
 
-        public ImageView getActivityIcon() {
+        private ImageView getActivityIcon() {
             return activityIcon;
         }
 
-        public TextView getActivityIconText() { return activityIconText; }
+        private TextView getActivityIconText() { return activityIconText; }
 
-        public TextView getTextViewSubtitle() { return textViewSubtitle; }
+        private TextView getTextViewSubtitle() { return textViewSubtitle; }
 
-        public TextView getActivityPointLabel() { return activityPointLabel; }
+        private TextView getActivityPointLabel() { return activityPointLabel; }
+    }
+
+    private class SubheadingViewHolder extends RecyclerView.ViewHolder {
+        private final TextView subheadingLabel;
+
+        private SubheadingViewHolder(View v) {
+            super(v);
+
+            subheadingLabel = (TextView) v.findViewById(R.id.subheadingLabel);
+        }
+
+        private TextView getSubheadingLabel() { return subheadingLabel; }
     }
 
     //provide a constructor
-    public HistoryAdapter(List<History> activityDataset) {
+    public HistoryAdapter(List<History> activityDataset, ItemClickedListener itemClickedListener) {
         mActivityDataset = activityDataset;
+        mItemClickedListener = itemClickedListener;
+
     }
 
     // create new views (used by layout manager)
     @Override
-    public HistoryAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_view, parent, false);
-
-        // set margins, etc
-        return new ViewHolder(v);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case -1: {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_subheading, parent, false);
+                return new SubheadingViewHolder(v);
+            }
+            default: {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_view, parent, false);
+                return new ViewHolder(v);
+            }
+        }
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
         // get activity
         History _history = mActivityDataset.get(position);
 
-        // activity name
-        TextView tv = holder.getTextView();
-        tv.setText(_history.getActivity().name);
+        if (getItemViewType(position) == -1) { // date row
+            SubheadingViewHolder holder = (SubheadingViewHolder) h;
+            TextView subheadingLabel = holder.getSubheadingLabel();
+            subheadingLabel.setText(mActivityDataset.get(position).getActivity().name);
+        } else { // history row
+            ViewHolder holder = (ViewHolder) h;
 
-        TextView activityIconText = holder.getActivityIconText();
-        activityIconText.setText(_history.getActivity().name.substring(0, 1).toUpperCase());
+            // activity name
+            TextView tv = holder.getTextView();
+            tv.setText(_history.getActivity().name);
 
-        TextView activityPointLabel = holder.getActivityPointLabel();
+            TextView activityIconText = holder.getActivityIconText();
+            activityIconText.setText(_history.getActivity().name.substring(0, 1).toUpperCase());
 
-        // set subtitle
-        TextView textViewSubtitle = holder.getTextViewSubtitle();
-        textViewSubtitle.setText(_history.getActivity().description +
-                " × " +
-                _history.getQuantity());
+            TextView activityPointLabel = holder.getActivityPointLabel();
 
-        final int ACTIVITY_TYPE_REWARD = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
-        final int ACTIVITY_TYPE_ACTIVITY = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
+            // set subtitle
+            TextView textViewSubtitle = holder.getTextViewSubtitle();
+            textViewSubtitle.setText(_history.getActivity().description +
+                    " × " +
+                    _history.getQuantity());
 
-        if (_history.getActivity().type == ACTIVITY_TYPE_REWARD) {
-            activityPointLabel.setText("▼ " + _history.getPoints());
-            activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
-            PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
-            holder.getActivityIcon().setColorFilter(activityFilter);
-        } else if (_history.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
-            activityPointLabel.setText("▲ " + _history.getPoints());
-            activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
-            PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
-            holder.getActivityIcon().setColorFilter(rewardFilter);
+            final int ACTIVITY_TYPE_REWARD = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
+            final int ACTIVITY_TYPE_ACTIVITY = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
+
+            if (_history.getActivity().type == ACTIVITY_TYPE_REWARD) {
+                activityPointLabel.setText("▼ " + _history.getPoints());
+                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
+                PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+                holder.getActivityIcon().setColorFilter(activityFilter);
+            } else if (_history.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
+                activityPointLabel.setText("▲ " + _history.getPoints());
+                activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
+                PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
+                holder.getActivityIcon().setColorFilter(rewardFilter);
+            }
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+Log.d("GETTING VIEW ITEM TYPE", "TOTAL ITEMS: " + mActivityDataset.size());
+        if (mActivityDataset.get(position).getActivity().id == -1) {
+            return -1;
+        } else {
+            return 0;
         }
     }
 
@@ -116,8 +181,21 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return mActivityDataset.size();
     }
 
-    public void updateAdapter(List<History> history) {
-        this.mActivityDataset = history;
-        notifyDataSetChanged();
+    protected void insertHistoryItem(History historyItem) {
+        int insertIndex = 0;
+        if (mActivityDataset.size() > 1) {
+            insertIndex = 1;
+        }
+        mActivityDataset.add(insertIndex, historyItem);
+        notifyItemInserted(insertIndex);
+
+        // TODO - determine whether to add a date row
+    }
+
+    protected void removeHistoryItem(History historyItem) {
+//        mActivityDataset.remove(historyItem);
+        //notifyItemRemoved(mActivityDataset.indexOf(historyItem));
+
+        // TODO - determine whether to remove a date row
     }
 }

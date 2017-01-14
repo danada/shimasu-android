@@ -1,11 +1,14 @@
 package enjoysmile.com.shimasu;
 
 import android.app.ActivityManager;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,21 +32,17 @@ import android.widget.TextView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import io.realm.exceptions.RealmMigrationNeededException;
 
-public class OverviewActivity extends AppCompatActivity {
+public class OverviewActivity extends AppCompatActivity implements HistoryAdapter.ItemClickedListener {
 
     private HistoryAdapter mActivityAdapter;
 
@@ -59,10 +60,10 @@ public class OverviewActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // recycler view
-        RecyclerView mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
+        final RecyclerView mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
 
         // use a linear layout manager
-        RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
+        final RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
         mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
 
         // open realm
@@ -85,7 +86,8 @@ public class OverviewActivity extends AppCompatActivity {
         RealmResults<History> historyResult = realm.where(History.class).findAllSorted("date", Sort.DESCENDING);
         historyData = new RealmList<>();
         historyData.addAll(historyResult.subList(0, historyResult.size()));
-        mActivityAdapter = new HistoryAdapter(historyData);
+        buildHistoryHeaders();
+        mActivityAdapter = new HistoryAdapter(historyData, this);
         mActivityRecyclerView.setAdapter(mActivityAdapter);
 
         // update the toolbar points
@@ -102,15 +104,18 @@ public class OverviewActivity extends AppCompatActivity {
             FloatingActionButton _fab = new FloatingActionButton(getBaseContext()); // new button
             _fab.setLabelText(activities.get(i).name);
             _fab.setButtonSize(FloatingActionButton.SIZE_MINI);
+
             if (activities.get(i).type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
                 _fab.setColorNormalResId(R.color.colorAccent);
                 _fab.setColorPressedResId(R.color.colorAccentDark);
-                _fab.setImageResource(R.drawable.ic_keyboard_arrow_down_white_24px);
             } else {
                 _fab.setColorNormalResId(R.color.colorPrimary);
                 _fab.setColorPressedResId(R.color.colorPrimaryDark);
-                _fab.setImageResource(R.drawable.ic_keyboard_arrow_up_white_24px);
             }
+
+            // set the button drawable
+            _fab.setImageDrawable(makeLetterDrawable(activities.get(i).name.substring(0, 1)));
+
 
             // hang onto this activity's index
             final int selectedIndex = i;
@@ -167,8 +172,7 @@ public class OverviewActivity extends AppCompatActivity {
                                     realm.commitTransaction();
 
                                     // update adapter
-                                    historyData.add(0, _historyToAdd);
-                                    mActivityAdapter.updateAdapter(historyData);
+                                    mActivityAdapter.insertHistoryItem(_historyToAdd);
 
                                     // update the toolbar
                                     TextView pointTotal = (TextView) findViewById(R.id.point_total);
@@ -342,6 +346,89 @@ public class OverviewActivity extends AppCompatActivity {
 
     }
 
+    protected void buildHistoryHeaders() {
+        if (historyData.size() > 0) {
+            for (int i = 0; i < historyData.size(); i++) {
+                // get current activity date
+                Calendar _calendar = Calendar.getInstance();
+                _calendar.setTimeInMillis(historyData.get(i).getDate());
+                final int _day = _calendar.get(Calendar.DAY_OF_MONTH);
+
+                String _dateString = DateUtils.getRelativeTimeSpanString(
+                        historyData.get(i).getDate(),
+                        System.currentTimeMillis(),
+                        DateUtils.DAY_IN_MILLIS
+                ).toString();
+
+                // first header
+                if (i == 0) {
+                    // build activity (holds date)
+                    Activity _a = new Activity(
+                            -1,
+                            _dateString,
+                            "",
+                            -1,
+                            0,
+                            false);
+                    // build history object (notifies adapter of date row)
+                    History _h = new History();
+                    _h.setId("-1");
+                    _h.setActivity(_a);
+                    _h.setQuantity(0);
+                    _h.setDate(0);
+                    _h.setPoints(0);
+
+                    // add date header
+                    historyData.add(i, _h);
+                } else if (historyData.get(i - 1).getActivity().id != -1) { // if previous item is not a date
+                    // get previous date number
+                    _calendar.setTimeInMillis(historyData.get(i - 1).getDate());
+
+                    // check if previous item's date is different
+                    if (_calendar.get(Calendar.DAY_OF_MONTH) != _day) {
+                        // set calendar back to current activity type
+                        _calendar.setTimeInMillis(historyData.get(i).getDate());
+
+                        // build activity (holds date)
+                        Activity _a = new Activity(
+                                -1,
+                                _dateString,
+                                "",
+                                -1,
+                                0,
+                                false);
+                        // build history object (notifies adapter of date row)
+                        History _h = new History();
+                        _h.setId("-1");
+                        _h.setActivity(_a);
+                        _h.setQuantity(0);
+                        _h.setDate(0);
+                        _h.setPoints(0);
+
+                        // add date header
+                        historyData.add(i, _h);
+                    }
+                }
+            }
+        }
+    }
+
+    protected BitmapDrawable makeLetterDrawable(String text) {
+        Bitmap bitmap = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888);
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(64);
+
+
+        Canvas canvas = new Canvas(bitmap);
+        int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2)) ;
+
+        canvas.drawText(text, canvas.getWidth() / 2, yPos, paint);
+        return new BitmapDrawable(getResources(), bitmap);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -366,5 +453,24 @@ public class OverviewActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onHistoryItemClicked(int position) {
+        Log.d("THIS ITEM WAS CLICKED", "POSITION: " + position);
+
+
+
+        // remove from realm;
+        realm.beginTransaction();
+//        historyData.get(position).deleteFromRealm();
+        RealmResults<History> _h = realm.where(History.class).equalTo("id", historyData.get(position).getId()).findAll();
+        _h.deleteFirstFromRealm();
+        realm.commitTransaction();
+
+        //
+        // remove this item
+        historyData.remove(position);
+        mActivityAdapter.notifyItemRemoved(position);
     }
 }
