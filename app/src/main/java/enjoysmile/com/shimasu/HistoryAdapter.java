@@ -51,26 +51,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         @Override
         public void onClick(View v) {
             Log.d("HISTORY_ADAPTER", "Element " + getAdapterPosition() + " clicked.");
-mItemClickedListener.onHistoryItemClicked(getAdapterPosition());
-            // TODO - dialog to confirm
-
-            // history to remove
-//            //removeHistoryItem(mActivityDataset.get(getAdapterPosition()));
-//            History _historyToRemove = mActivityDataset.get(getAdapterPosition());
-//            mActivityDataset.remove(getAdapterPosition());
-//            notifyItemRemoved(getAdapterPosition());
-//
-//            Realm.init(v.getContext());
-//            Realm realm = Realm.getDefaultInstance();
-//            realm.beginTransaction();
-//            //RealmResults<History> _h = realm.where(History.class).equalTo("id", mActivityDataset.get(getAdapterPosition()).getId()).findAll();
-//            //_h.deleteFirstFromRealm();
-//            _historyToRemove.deleteFromRealm();
-//
-//            // TODO - remove points from user object
-//
-//            realm.commitTransaction();
-//            realm.close();
+            mItemClickedListener.onHistoryItemClicked(getAdapterPosition());
         }
 
         private TextView getTextView() {
@@ -107,7 +88,6 @@ mItemClickedListener.onHistoryItemClicked(getAdapterPosition());
 
     }
 
-    // create new views (used by layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
@@ -168,7 +148,6 @@ mItemClickedListener.onHistoryItemClicked(getAdapterPosition());
 
     @Override
     public int getItemViewType(int position) {
-Log.d("GETTING VIEW ITEM TYPE", "TOTAL ITEMS: " + mActivityDataset.size());
         if (mActivityDataset.get(position).getActivity().id == -1) {
             return -1;
         } else {
@@ -183,7 +162,7 @@ Log.d("GETTING VIEW ITEM TYPE", "TOTAL ITEMS: " + mActivityDataset.size());
 
     protected void insertHistoryItem(History historyItem) {
         int insertIndex = 0;
-        if (mActivityDataset.size() > 1) {
+        if (mActivityDataset.size() > 0) {
             insertIndex = 1;
         }
         mActivityDataset.add(insertIndex, historyItem);

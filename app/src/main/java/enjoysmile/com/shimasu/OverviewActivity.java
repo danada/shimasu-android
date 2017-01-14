@@ -159,26 +159,46 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                                     // copy to realm
                                     realm.beginTransaction();
                                     realm.copyToRealmOrUpdate(_historyToAdd);
-
-                                    // update user points
-                                    if (_historyToAdd.getActivity().type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
-                                        // subtract points
-                                        mUser.setPoints(mUser.getPoints() - _historyToAdd.getPoints());
-                                    } else {
-                                        // add points
-                                        mUser.setPoints(mUser.getPoints() + _historyToAdd.getPoints());
-                                    }
                                     realm.copyToRealmOrUpdate(mUser);
                                     realm.commitTransaction();
 
+                                    // update points label
+                                    int difference = _historyToAdd.getPoints() *
+                                            (_historyToAdd.getActivity().type ==
+                                                    getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD) ? -1 : 1);
+                                    updateUserPoints(difference);
+
+
+                                    // if first item
+                                    if (historyData.size() == 0) {
+                                        // get current activity date string
+                                        String _dateString = DateUtils.getRelativeTimeSpanString(
+                                                _historyToAdd.getDate(),
+                                                System.currentTimeMillis(),
+                                                DateUtils.DAY_IN_MILLIS).toString();
+
+                                        // build activity (holds date)
+                                        Activity _a = new Activity(
+                                                -1,
+                                                _dateString,
+                                                "",
+                                                -1,
+                                                0,
+                                                false);
+                                        // build history object (notifies adapter of date row)
+                                        History _h = new History();
+                                        _h.setId("-1");
+                                        _h.setActivity(_a);
+                                        _h.setQuantity(0);
+                                        _h.setDate(0);
+                                        _h.setPoints(0);
+
+                                        // add date header
+                                        mActivityAdapter.insertHistoryItem(_h);
+                                    }
+
                                     // update adapter
                                     mActivityAdapter.insertHistoryItem(_historyToAdd);
-
-                                    // update the toolbar
-                                    TextView pointTotal = (TextView) findViewById(R.id.point_total);
-                                    TextView pointSubtitle = (TextView) findViewById(R.id.point_subtitle);
-                                    pointTotal.setText(String.format(Locale.getDefault(), "%d", mUser.getPoints()));
-                                    pointSubtitle.setText(mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));
 
                                     // close dialog
                                     dialog.dismiss();
@@ -429,6 +449,19 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
         return new BitmapDrawable(getResources(), bitmap);
     }
 
+    protected void updateUserPoints(int difference) {
+        // update the user object
+        realm.beginTransaction();
+        mUser.setPoints(mUser.getPoints() + difference);
+        realm.commitTransaction();
+
+        // update the toolbar
+        TextView pointTotal = (TextView) findViewById(R.id.point_total);
+        TextView pointSubtitle = (TextView) findViewById(R.id.point_subtitle);
+        pointTotal.setText(String.format(Locale.getDefault(), "%d", mUser.getPoints()));
+        pointSubtitle.setText(mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -459,18 +492,46 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
     public void onHistoryItemClicked(int position) {
         Log.d("THIS ITEM WAS CLICKED", "POSITION: " + position);
 
+        final int clickedItemPosition = position;
 
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        int difference = historyData.get(clickedItemPosition).getPoints() *
+                                (historyData.get(clickedItemPosition).getActivity().type ==
+                                        getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD) ? 1 : -1);
+                        updateUserPoints(difference);
 
-        // remove from realm;
-        realm.beginTransaction();
-//        historyData.get(position).deleteFromRealm();
-        RealmResults<History> _h = realm.where(History.class).equalTo("id", historyData.get(position).getId()).findAll();
-        _h.deleteFirstFromRealm();
-        realm.commitTransaction();
+                        // remove from realm;
+                        realm.beginTransaction();
+                        RealmResults<History> _h = realm.where(History.class).equalTo("id", historyData.get(clickedItemPosition).getId()).findAll();
+                        _h.deleteFirstFromRealm();
+                        realm.commitTransaction();
 
-        //
-        // remove this item
-        historyData.remove(position);
-        mActivityAdapter.notifyItemRemoved(position);
+                        // remove this item
+                        historyData.remove(clickedItemPosition);
+                        mActivityAdapter.notifyItemRemoved(clickedItemPosition);
+
+                        // if there's only one item left (date) remove it
+                        if (historyData.size() == 1) {
+                            historyData.remove(0);
+                            mActivityAdapter.notifyItemRemoved(0);
+                        } else if (historyData.get(clickedItemPosition - 1).getActivity().type == -1 && // if sandwiched by dates
+                                historyData.size() > clickedItemPosition + 1 &&
+                                historyData.get(clickedItemPosition + 1).getActivity().type == -1) {
+                            // remove the leading date object
+                            historyData.remove(clickedItemPosition - 1);
+                            mActivityAdapter.notifyItemRemoved(clickedItemPosition - 1);
+                        }
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Remove log entry?").setPositiveButton("Remove", dialogClickListener)
+                .setNegativeButton("Cancel", dialogClickListener).show();
     }
 }
