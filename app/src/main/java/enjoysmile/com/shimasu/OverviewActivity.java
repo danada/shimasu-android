@@ -46,8 +46,8 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
 
     private HistoryAdapter mActivityAdapter;
 
-    private RealmList<History> historyData;
-    private RealmList<Activity> activities;
+    private RealmList<History> mHistoryData;
+    private RealmList<Activity> mActivityData;
 
     private User mUser;
     private Realm realm;
@@ -76,36 +76,30 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
 
         // initiate user
         mUser = initializeUser();
+        updateUserPoints(0);
 
         // get activities
         RealmResults<Activity> activityResult = realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
-        activities = new RealmList<>();
-        activities.addAll(activityResult.subList(0, activityResult.size()));
+        mActivityData = new RealmList<>();
+        mActivityData.addAll(activityResult.subList(0, activityResult.size()));
 
         // get history
-        RealmResults<History> historyResult = realm.where(History.class).findAllSorted("date", Sort.DESCENDING);
-        historyData = new RealmList<>();
-        historyData.addAll(historyResult.subList(0, historyResult.size()));
+        final RealmResults<History> historyResult = realm.where(History.class).findAllSorted("date", Sort.DESCENDING);
+        mHistoryData = new RealmList<>();
+        mHistoryData.addAll(historyResult.subList(0, historyResult.size()));
+        mActivityAdapter = new HistoryAdapter(mHistoryData, this);
         buildHistoryHeaders();
-        mActivityAdapter = new HistoryAdapter(historyData, this);
         mActivityRecyclerView.setAdapter(mActivityAdapter);
-
-        // update the toolbar points
-        TextView pointTotal = (TextView) findViewById(R.id.point_total);
-        TextView pointSubtitle = (TextView) findViewById(R.id.point_subtitle);
-        pointTotal.setText(String.format(Locale.getDefault(), "%d", mUser.getPoints()));
-        pointSubtitle.setText(mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));
-
 
         // build floating action menu
         final FloatingActionMenu menuMultipleActions = (FloatingActionMenu) findViewById(R.id.multiple_actions);
 
-        for (int i = 0; i < activities.size(); i++) {
+        for (int i = 0; i < mActivityData.size(); i++) {
             FloatingActionButton _fab = new FloatingActionButton(getBaseContext()); // new button
-            _fab.setLabelText(activities.get(i).name);
+            _fab.setLabelText(mActivityData.get(i).name);
             _fab.setButtonSize(FloatingActionButton.SIZE_MINI);
 
-            if (activities.get(i).type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
+            if (mActivityData.get(i).type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
                 _fab.setColorNormalResId(R.color.colorAccent);
                 _fab.setColorPressedResId(R.color.colorAccentDark);
             } else {
@@ -114,7 +108,7 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
             }
 
             // set the button drawable
-            _fab.setImageDrawable(makeLetterDrawable(activities.get(i).name.substring(0, 1)));
+            _fab.setImageDrawable(makeLetterDrawable(mActivityData.get(i).name.substring(0, 1)));
 
 
             // hang onto this activity's index
@@ -128,10 +122,10 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                     LayoutInflater inflater = getLayoutInflater();
                     final View dialogView = inflater.inflate(R.layout.dialog_fragment_add_activity, menuMultipleActions, false);
 
-                    // TODO - get appropriate activities
-                    final List<Activity> availableActivities = activities;
+                    // TODO - get appropriate mActivityData
+                    final List<Activity> availableActivities = mActivityData;
 
-                    // build the activities array
+                    // build the mActivityData array
                     String[] activityArray = new String[availableActivities.size()];
                     for (int i = 0; i < availableActivities.size(); i++) {
                         activityArray[i] = availableActivities.get(i).name;
@@ -140,13 +134,10 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                     // build new history object
                     final History _historyToAdd = new History();
                     _historyToAdd.setId(UUID.randomUUID().toString());
-                    _historyToAdd.setActivity(activities.get(selectedIndex));
+                    _historyToAdd.setActivity(mActivityData.get(selectedIndex));
                     _historyToAdd.setQuantity(1);
                     _historyToAdd.setDate(System.currentTimeMillis());
-                    _historyToAdd.setPoints(activities.get(selectedIndex).points);
-
-
-
+                    _historyToAdd.setPoints(mActivityData.get(selectedIndex).points);
 
                     builder.setView(dialogView)
                             .setTitle("Log Activity")
@@ -170,35 +161,17 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
 
 
                                     // if first item
-                                    if (historyData.size() == 0) {
-                                        // get current activity date string
-                                        String _dateString = DateUtils.getRelativeTimeSpanString(
-                                                _historyToAdd.getDate(),
-                                                System.currentTimeMillis(),
-                                                DateUtils.DAY_IN_MILLIS).toString();
-
-                                        // build activity (holds date)
-                                        Activity _a = new Activity(
-                                                -1,
-                                                _dateString,
-                                                "",
-                                                -1,
-                                                0,
-                                                false);
-                                        // build history object (notifies adapter of date row)
-                                        History _h = new History();
-                                        _h.setId("-1");
-                                        _h.setActivity(_a);
-                                        _h.setQuantity(0);
-                                        _h.setDate(0);
-                                        _h.setPoints(0);
-
-                                        // add date header
-                                        mActivityAdapter.insertHistoryItem(_h);
+                                    if (mHistoryData.size() == 0) {
+                                        insertDateRow(0, _historyToAdd.getDate());
                                     }
 
                                     // update adapter
-                                    mActivityAdapter.insertHistoryItem(_historyToAdd);
+                                    int insertIndex = 0;
+                                    if (mHistoryData.size() > 0) {
+                                        insertIndex = 1;
+                                    }
+                                    mHistoryData.add(insertIndex, _historyToAdd);
+                                    mActivityAdapter.notifyItemInserted(insertIndex);
 
                                     // close dialog
                                     dialog.dismiss();
@@ -244,10 +217,10 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                             TextView pointTotalLabel = (TextView) dialogView.findViewById(R.id.add_activity_point_total_label);
 
                             if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
-                                pointTotalLabel.setText("▼ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setText(getString(R.string.reward_point_label, _historyToAdd.getPoints()));
                                 pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointDown));
                             } else if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
-                                pointTotalLabel.setText("▲ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setText(getString(R.string.activity_point_label, _historyToAdd.getPoints()));
                                 pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointUp));
                             }
 
@@ -286,10 +259,10 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                             TextView pointTotalLabel = (TextView) dialogView.findViewById(R.id.add_activity_point_total_label);
 
                             if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
-                                pointTotalLabel.setText("▼ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setText(getString(R.string.reward_point_label, _historyToAdd.getPoints()));
                                 pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointDown));
                             } else if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
-                                pointTotalLabel.setText("▲ " + String.format(Locale.getDefault(), "%d", _historyToAdd.getPoints()));
+                                pointTotalLabel.setText(getString(R.string.activity_point_label, _historyToAdd.getPoints()));
                                 pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointUp));
                             }
 
@@ -346,7 +319,7 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
     }
 
     protected User initializeUser() {
-        // get activities
+        // get mActivityData
         RealmResults<User> userResults = realm.where(User.class).findAll();
         if (userResults.size() < 1) {
             // make a new user
@@ -367,66 +340,21 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
     }
 
     protected void buildHistoryHeaders() {
-        if (historyData.size() > 0) {
-            for (int i = 0; i < historyData.size(); i++) {
+        if (mHistoryData.size() > 0) {
+            for (int i = 0; i < mHistoryData.size(); i++) {
                 // get current activity date
                 Calendar _calendar = Calendar.getInstance();
-                _calendar.setTimeInMillis(historyData.get(i).getDate());
+                _calendar.setTimeInMillis(mHistoryData.get(i).getDate());
                 final int _day = _calendar.get(Calendar.DAY_OF_MONTH);
 
-                String _dateString = DateUtils.getRelativeTimeSpanString(
-                        historyData.get(i).getDate(),
-                        System.currentTimeMillis(),
-                        DateUtils.DAY_IN_MILLIS
-                ).toString();
-
-                // first header
-                if (i == 0) {
-                    // build activity (holds date)
-                    Activity _a = new Activity(
-                            -1,
-                            _dateString,
-                            "",
-                            -1,
-                            0,
-                            false);
-                    // build history object (notifies adapter of date row)
-                    History _h = new History();
-                    _h.setId("-1");
-                    _h.setActivity(_a);
-                    _h.setQuantity(0);
-                    _h.setDate(0);
-                    _h.setPoints(0);
-
-                    // add date header
-                    historyData.add(i, _h);
-                } else if (historyData.get(i - 1).getActivity().id != -1) { // if previous item is not a date
+                if (i == 0) { // first header
+                    insertDateRow(i, mHistoryData.get(i).getDate());
+                } else if (mHistoryData.get(i - 1).getActivity().id != -1) { // if previous item is not a date
                     // get previous date number
-                    _calendar.setTimeInMillis(historyData.get(i - 1).getDate());
-
+                    _calendar.setTimeInMillis(mHistoryData.get(i - 1).getDate());
                     // check if previous item's date is different
                     if (_calendar.get(Calendar.DAY_OF_MONTH) != _day) {
-                        // set calendar back to current activity type
-                        _calendar.setTimeInMillis(historyData.get(i).getDate());
-
-                        // build activity (holds date)
-                        Activity _a = new Activity(
-                                -1,
-                                _dateString,
-                                "",
-                                -1,
-                                0,
-                                false);
-                        // build history object (notifies adapter of date row)
-                        History _h = new History();
-                        _h.setId("-1");
-                        _h.setActivity(_a);
-                        _h.setQuantity(0);
-                        _h.setDate(0);
-                        _h.setPoints(0);
-
-                        // add date header
-                        historyData.add(i, _h);
+                        insertDateRow(i, mHistoryData.get(i).getDate());
                     }
                 }
             }
@@ -460,6 +388,35 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
         TextView pointSubtitle = (TextView) findViewById(R.id.point_subtitle);
         pointTotal.setText(String.format(Locale.getDefault(), "%d", mUser.getPoints()));
         pointSubtitle.setText(mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));
+    }
+
+    protected void insertDateRow(int at, long date) {
+        // get current activity date string
+        String _dateString = DateUtils.getRelativeTimeSpanString(
+                date,
+                System.currentTimeMillis(),
+                DateUtils.DAY_IN_MILLIS).toString();
+
+        // build activity (holds date)
+        Activity _a = new Activity(
+                -1,
+                _dateString,
+                "",
+                -1,
+                0,
+                false);
+        // build history object (notifies adapter of date row)
+        History _h = new History();
+        _h.setId("-1");
+        _h.setActivity(_a);
+        _h.setQuantity(0);
+        _h.setDate(0);
+        _h.setPoints(0);
+
+        // add date header
+        mHistoryData.add(at, _h);
+        // notify adapter
+        mActivityAdapter.notifyItemInserted(at);
     }
 
     @Override
@@ -499,30 +456,30 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
-                        int difference = historyData.get(clickedItemPosition).getPoints() *
-                                (historyData.get(clickedItemPosition).getActivity().type ==
+                        int difference = mHistoryData.get(clickedItemPosition).getPoints() *
+                                (mHistoryData.get(clickedItemPosition).getActivity().type ==
                                         getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD) ? 1 : -1);
                         updateUserPoints(difference);
 
                         // remove from realm;
                         realm.beginTransaction();
-                        RealmResults<History> _h = realm.where(History.class).equalTo("id", historyData.get(clickedItemPosition).getId()).findAll();
+                        RealmResults<History> _h = realm.where(History.class).equalTo("id", mHistoryData.get(clickedItemPosition).getId()).findAll();
                         _h.deleteFirstFromRealm();
                         realm.commitTransaction();
 
                         // remove this item
-                        historyData.remove(clickedItemPosition);
+                        mHistoryData.remove(clickedItemPosition);
                         mActivityAdapter.notifyItemRemoved(clickedItemPosition);
 
                         // if there's only one item left (date) remove it
-                        if (historyData.size() == 1) {
-                            historyData.remove(0);
+                        if (mHistoryData.size() == 1) {
+                            mHistoryData.remove(0);
                             mActivityAdapter.notifyItemRemoved(0);
-                        } else if (historyData.get(clickedItemPosition - 1).getActivity().type == -1 && // if sandwiched by dates
-                                historyData.size() > clickedItemPosition + 1 &&
-                                historyData.get(clickedItemPosition).getActivity().type == -1) {
+                        } else if (mHistoryData.get(clickedItemPosition - 1).getActivity().type == -1 && // if sandwiched by dates
+                                mHistoryData.size() > clickedItemPosition + 1 &&
+                                mHistoryData.get(clickedItemPosition).getActivity().type == -1) {
                             // remove the leading date object
-                            historyData.remove(clickedItemPosition - 1);
+                            mHistoryData.remove(clickedItemPosition - 1);
                             mActivityAdapter.notifyItemRemoved(clickedItemPosition - 1);
                         }
                         break;

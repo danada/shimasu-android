@@ -4,7 +4,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,22 +12,21 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
-
 /**
  * Created by Daniel on 11/17/2016.
+ * HistoryAdapter displays history items in the main
+ * OverviewActivity
  */
 
-public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<History> mActivityDataset;
+class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private List<History> mHistoryData;
     private ItemClickedListener mItemClickedListener;
 
-    public interface ItemClickedListener {
+    interface ItemClickedListener {
         void onHistoryItemClicked(int position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView textView;
         private final ImageView activityIcon;
         private final TextView activityIconText;
@@ -50,7 +48,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Override
         public void onClick(View v) {
-            Log.d("HISTORY_ADAPTER", "Element " + getAdapterPosition() + " clicked.");
             mItemClickedListener.onHistoryItemClicked(getAdapterPosition());
         }
 
@@ -82,8 +79,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     //provide a constructor
-    public HistoryAdapter(List<History> activityDataset, ItemClickedListener itemClickedListener) {
-        mActivityDataset = activityDataset;
+    HistoryAdapter(List<History> activityDataset, ItemClickedListener itemClickedListener) {
+        mHistoryData = activityDataset;
         mItemClickedListener = itemClickedListener;
 
     }
@@ -105,12 +102,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
         // get activity
-        History _history = mActivityDataset.get(position);
+        History _history = mHistoryData.get(position);
 
         if (getItemViewType(position) == -1) { // date row
             SubheadingViewHolder holder = (SubheadingViewHolder) h;
             TextView subheadingLabel = holder.getSubheadingLabel();
-            subheadingLabel.setText(mActivityDataset.get(position).getActivity().name);
+            subheadingLabel.setText(mHistoryData.get(position).getActivity().name);
         } else { // history row
             ViewHolder holder = (ViewHolder) h;
 
@@ -133,12 +130,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             final int ACTIVITY_TYPE_ACTIVITY = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
 
             if (_history.getActivity().type == ACTIVITY_TYPE_REWARD) {
-                activityPointLabel.setText("▼ " + _history.getPoints());
+                activityPointLabel.setText(tv.getContext().getString(R.string.activity_point_label, _history.getPoints()));
                 activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
                 PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
                 holder.getActivityIcon().setColorFilter(activityFilter);
             } else if (_history.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
-                activityPointLabel.setText("▲ " + _history.getPoints());
+                activityPointLabel.setText(tv.getContext().getString(R.string.reward_point_label, _history.getPoints()));
                 activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
                 PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
                 holder.getActivityIcon().setColorFilter(rewardFilter);
@@ -148,7 +145,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-        if (mActivityDataset.get(position).getActivity().id == -1) {
+        if (mHistoryData.get(position).getActivity().id == -1) {
             return -1;
         } else {
             return 0;
@@ -157,24 +154,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        return mActivityDataset.size();
-    }
-
-    protected void insertHistoryItem(History historyItem) {
-        int insertIndex = 0;
-        if (mActivityDataset.size() > 0) {
-            insertIndex = 1;
-        }
-        mActivityDataset.add(insertIndex, historyItem);
-        notifyItemInserted(insertIndex);
-
-        // TODO - determine whether to add a date row
-    }
-
-    protected void removeHistoryItem(History historyItem) {
-//        mActivityDataset.remove(historyItem);
-        //notifyItemRemoved(mActivityDataset.indexOf(historyItem));
-
-        // TODO - determine whether to remove a date row
+        return mHistoryData.size();
     }
 }

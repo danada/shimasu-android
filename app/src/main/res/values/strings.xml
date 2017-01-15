@@ -5,15 +5,19 @@
     <string name="title_activity_add">Add Activity</string>
     <string name="point">point</string>
     <string name="point_plural">points</string>
+    <string name="activity_point_label">▲ %1$d</string>
+    <string name="reward_point_label">▼ %1$d</string>
 
     <string-array name="activity_types">
         <item>Activity</item>
         <item>Reward</item>
     </string-array>
+
     <string-array name="activity_types_description">
         <item>Earns points</item>
         <item>Consumes points</item>
     </string-array>
+
     <string-array name="repeatable_description">
         <item>Once daily</item>
         <item>Can repeat</item>
