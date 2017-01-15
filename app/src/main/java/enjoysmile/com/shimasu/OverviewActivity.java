@@ -11,6 +11,8 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,21 +21,15 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -42,15 +38,17 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class OverviewActivity extends AppCompatActivity implements HistoryAdapter.ItemClickedListener {
+public class OverviewActivity extends AppCompatActivity implements HistoryAdapter.ItemClickedListener, FragmentActivityLog.ActivityLoggedListener {
 
     private HistoryAdapter mActivityAdapter;
+    private RecyclerView mActivityRecyclerView;
 
     private RealmList<History> mHistoryData;
-    private RealmList<Activity> mActivityData;
 
     private User mUser;
     private Realm realm;
+
+    private FloatingActionMenu mFloatingActionMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +58,7 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
         setSupportActionBar(toolbar);
 
         // recycler view
-        final RecyclerView mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
-
+        mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
         // use a linear layout manager
         final RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
         mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
@@ -80,8 +77,8 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
 
         // get activities
         RealmResults<Activity> activityResult = realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
-        mActivityData = new RealmList<>();
-        mActivityData.addAll(activityResult.subList(0, activityResult.size()));
+        RealmList<Activity> activityData = new RealmList<>();
+        activityData.addAll(activityResult.subList(0, activityResult.size()));
 
         // get history
         final RealmResults<History> historyResult = realm.where(History.class).findAllSorted("date", Sort.DESCENDING);
@@ -92,23 +89,23 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
         mActivityRecyclerView.setAdapter(mActivityAdapter);
 
         // build floating action menu
-        final FloatingActionMenu menuMultipleActions = (FloatingActionMenu) findViewById(R.id.multiple_actions);
+        mFloatingActionMenu = (FloatingActionMenu) findViewById(R.id.multiple_actions);
 
-        for (int i = 0; i < mActivityData.size(); i++) {
-            FloatingActionButton _fab = new FloatingActionButton(getBaseContext()); // new button
-            _fab.setLabelText(mActivityData.get(i).name);
+        for (int i = 0; i < activityData.size(); i++) {
+            FloatingActionButton _fab = new FloatingActionButton(getBaseContext());
+
+            // customize button's appearance
+            _fab.setLabelText(activityData.get(i).name);
             _fab.setButtonSize(FloatingActionButton.SIZE_MINI);
-
-            if (mActivityData.get(i).type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
+            if (activityData.get(i).type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
                 _fab.setColorNormalResId(R.color.colorAccent);
                 _fab.setColorPressedResId(R.color.colorAccentDark);
             } else {
                 _fab.setColorNormalResId(R.color.colorPrimary);
                 _fab.setColorPressedResId(R.color.colorPrimaryDark);
             }
-
             // set the button drawable
-            _fab.setImageDrawable(makeLetterDrawable(mActivityData.get(i).name.substring(0, 1)));
+            _fab.setImageDrawable(makeLetterDrawable(activityData.get(i).name.substring(0, 1)));
 
 
             // hang onto this activity's index
@@ -118,176 +115,15 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
             _fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(OverviewActivity.this);
-                    LayoutInflater inflater = getLayoutInflater();
-                    final View dialogView = inflater.inflate(R.layout.dialog_fragment_add_activity, menuMultipleActions, false);
-
-                    // TODO - get appropriate mActivityData
-                    final List<Activity> availableActivities = mActivityData;
-
-                    // build the mActivityData array
-                    String[] activityArray = new String[availableActivities.size()];
-                    for (int i = 0; i < availableActivities.size(); i++) {
-                        activityArray[i] = availableActivities.get(i).name;
-                    }
-
-                    // build new history object
-                    final History _historyToAdd = new History();
-                    _historyToAdd.setId(UUID.randomUUID().toString());
-                    _historyToAdd.setActivity(mActivityData.get(selectedIndex));
-                    _historyToAdd.setQuantity(1);
-                    _historyToAdd.setDate(System.currentTimeMillis());
-                    _historyToAdd.setPoints(mActivityData.get(selectedIndex).points);
-
-                    builder.setView(dialogView)
-                            .setTitle("Log Activity")
-                            .setPositiveButton("Log", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int id) {
-                                    // set the time
-                                    _historyToAdd.setDate(System.currentTimeMillis());
-
-                                    // copy to realm
-                                    realm.beginTransaction();
-                                    realm.copyToRealmOrUpdate(_historyToAdd);
-                                    realm.copyToRealmOrUpdate(mUser);
-                                    realm.commitTransaction();
-
-                                    // update points label
-                                    int difference = _historyToAdd.getPoints() *
-                                            (_historyToAdd.getActivity().type ==
-                                                    getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD) ? -1 : 1);
-                                    updateUserPoints(difference);
-
-
-                                    // if first item
-                                    if (mHistoryData.size() == 0) {
-                                        insertDateRow(0, _historyToAdd.getDate());
-                                    }
-
-                                    // update adapter
-                                    int insertIndex = 0;
-                                    if (mHistoryData.size() > 0) {
-                                        insertIndex = 1;
-                                    }
-                                    mHistoryData.add(insertIndex, _historyToAdd);
-                                    mActivityAdapter.notifyItemInserted(insertIndex);
-
-                                    // close dialog
-                                    dialog.dismiss();
-
-                                    // close the floating action menu
-                                    menuMultipleActions.close(true);
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.dismiss();
-                                }
-                            });
-
-                    // show the dialog
-                    final AlertDialog dialog = builder.create();
-
-                    View.OnClickListener amountButtonListener = new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // update history quantity
-                            switch(view.getId()) {
-                                case R.id.add_activity_amount_decrease:
-                                    if (_historyToAdd.getQuantity() - 1 > 0) {
-                                        _historyToAdd.setQuantity(_historyToAdd.getQuantity() - 1);
-                                    }
-                                    break;
-                                case R.id.add_activity_amount_increase:
-                                    _historyToAdd.setQuantity(_historyToAdd.getQuantity() + 1);
-                                    break;
-                            }
-
-                            // recalculate points
-                            _historyToAdd.setPoints(_historyToAdd.getQuantity() * _historyToAdd.getActivity().points);
-
-                            // update amount label
-                            TextView amountLabel = (TextView) dialogView.findViewById(R.id.add_activity_amount_label);
-                            amountLabel.setText(String.format(Locale.getDefault(), "%d", _historyToAdd.getQuantity()));
-
-                            // update points label
-                            final int ACTIVITY_TYPE_REWARD = getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
-                            final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
-                            TextView pointTotalLabel = (TextView) dialogView.findViewById(R.id.add_activity_point_total_label);
-
-                            if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
-                                pointTotalLabel.setText(getString(R.string.reward_point_label, _historyToAdd.getPoints()));
-                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointDown));
-                            } else if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
-                                pointTotalLabel.setText(getString(R.string.activity_point_label, _historyToAdd.getPoints()));
-                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointUp));
-                            }
-
-                            // disable log button if not enough points
-                            if (_historyToAdd.getPoints() > mUser.getPoints() &&
-                                    _historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                            } else {
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                            }
-                        }
-                    };
-
-                    // build amount buttons
-                    Button amountDecrease = (Button) dialogView.findViewById(R.id.add_activity_amount_decrease);
-                    Button amountIncrease = (Button) dialogView.findViewById(R.id.add_activity_amount_increase);
-                    amountDecrease.setOnClickListener(amountButtonListener);
-                    amountIncrease.setOnClickListener(amountButtonListener);
-
-                    // build activity spinner
-                    Spinner spinner = (Spinner) dialogView.findViewById(R.id.add_activity_spinner);
-                    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(OverviewActivity.this,
-                            android.R.layout.simple_spinner_item,
-                            activityArray); //selected item will look like a spinner set from XML
-                    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(spinnerArrayAdapter);
-                    spinner.setSelection(selectedIndex); // set default selected index
-                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            _historyToAdd.setActivity(availableActivities.get(i));
-                            _historyToAdd.setPoints(_historyToAdd.getQuantity() * _historyToAdd.getActivity().points);
-                            // update points label
-                            final int ACTIVITY_TYPE_REWARD = getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
-                            final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
-                            TextView pointTotalLabel = (TextView) dialogView.findViewById(R.id.add_activity_point_total_label);
-
-                            if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
-                                pointTotalLabel.setText(getString(R.string.reward_point_label, _historyToAdd.getPoints()));
-                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointDown));
-                            } else if (_historyToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
-                                pointTotalLabel.setText(getString(R.string.activity_point_label, _historyToAdd.getPoints()));
-                                pointTotalLabel.setTextColor(ContextCompat.getColor(OverviewActivity.this, R.color.colorPointUp));
-                            }
-
-                            // disable log button if not enough points
-                            if (_historyToAdd.getPoints() > mUser.getPoints() &&
-                                    _historyToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                            } else {
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-                            }
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-
-                        }
-                    });
-
-                    dialog.show();
+                    // create new dialog instance with activity index
+                    DialogFragment newFragment = FragmentActivityLog.newInstance(selectedIndex, OverviewActivity.this);
+                    newFragment.show(getSupportFragmentManager(), "dialog");
                 }
             });
 
 
             // add the button
-            menuMultipleActions.addMenuButton(_fab);
+            mFloatingActionMenu.addMenuButton(_fab);
         }
 
         // hide and show the floating menu
@@ -299,9 +135,9 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
             @Override
             public void onScrolled(RecyclerView view, int dx, int dy) {
                 if (dy > 0) {
-                    menuMultipleActions.hideMenuButton(true);
+                    mFloatingActionMenu.hideMenuButton(true);
                 } else {
-                    menuMultipleActions.showMenuButton(true);
+                    mFloatingActionMenu.showMenuButton(true);
                 }
                 super.onScrolled(view, dx, dy);
             }
@@ -336,7 +172,6 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
             // return our current user
             return userResults.first();
         }
-
     }
 
     protected void buildHistoryHeaders() {
@@ -447,8 +282,6 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
 
     @Override
     public void onHistoryItemClicked(int position) {
-        Log.d("THIS ITEM WAS CLICKED", "POSITION: " + position);
-
         final int clickedItemPosition = position;
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -490,5 +323,50 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Remove log entry?").setPositiveButton("Remove", dialogClickListener)
                 .setNegativeButton("Cancel", dialogClickListener).show();
+    }
+
+    @Override
+    public void onActivityLogged(History historyToAdd) {
+        // update points label
+        int difference = historyToAdd.getPoints() *
+                (historyToAdd.getActivity().type ==
+                        getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD) ? -1 : 1);
+        updateUserPoints(difference);
+
+
+
+
+        String _dateString = DateUtils.getRelativeTimeSpanString(
+                historyToAdd.getDate(),
+                System.currentTimeMillis(),
+                DateUtils.DAY_IN_MILLIS).toString();
+
+        // if first item
+        if (mHistoryData.size() == 0) {
+            insertDateRow(0, historyToAdd.getDate());
+        } else if (mHistoryData.size() > 0 &&
+                !mHistoryData.get(0).getActivity().name.equals(_dateString)) {
+            // insert a date row
+            insertDateRow(0, historyToAdd.getDate());
+        }
+
+        mHistoryData.add(1, historyToAdd);
+        mActivityAdapter.notifyItemInserted(1);
+
+        // scroll up
+        mActivityRecyclerView.scrollToPosition(0);
+
+        // close menu
+        mFloatingActionMenu.close(true);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
     }
 }
