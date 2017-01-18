@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.Locale;
 import java.util.UUID;
 
@@ -73,7 +75,7 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
         // build the mActivityData array
         String[] activityArray = new String[mActivityData.size()];
         for (int i = 0; i < mActivityData.size(); i++) {
-            activityArray[i] = mActivityData.get(i).name;
+            activityArray[i] = mActivityData.get(i).getName();
         }
 
         // build history object
@@ -82,7 +84,7 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
         mHistoryToAdd.setActivity(mActivityData.get(getArguments().getInt("activityIndex")));
         mHistoryToAdd.setQuantity(1);
         mHistoryToAdd.setDate(System.currentTimeMillis());
-        mHistoryToAdd.setPoints(mActivityData.get(getArguments().getInt("activityIndex")).points);
+        mHistoryToAdd.setPoints(mActivityData.get(getArguments().getInt("activityIndex")).getPoints());
 
         // build the view
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -91,8 +93,8 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
         // build the dialog
         mDialog = new AlertDialog.Builder(getActivity())
                 .setView(mDialogView)
-                .setTitle("Log Activity")
-                .setPositiveButton("Log",
+                .setTitle(getString(R.string.dialog_fragment_add_activity_title))
+                .setPositiveButton(getString(R.string.dialog_fragment_add_activity_log_button),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 // set the time
@@ -111,7 +113,7 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
                             }
                         }
                 )
-                .setNegativeButton("Cancel",
+                .setNegativeButton(getString(R.string.dialog_fragment_add_activity_cancel_button),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 realm.close();
@@ -126,6 +128,10 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
         Button amountIncrease = (Button) mDialogView.findViewById(R.id.add_activity_amount_increase);
         amountDecrease.setOnClickListener(this);
         amountIncrease.setOnClickListener(this);
+
+        // set the quantity
+        TextView amountTextView = (TextView) mDialogView.findViewById(R.id.add_activity_amount_label);
+        amountTextView.setText(String.format(Locale.getDefault(), "%d", mHistoryToAdd.getQuantity()));
 
         // build activity spinner
         Spinner spinner = (Spinner) mDialogView.findViewById(R.id.add_activity_spinner);
@@ -143,23 +149,23 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         mHistoryToAdd.setActivity(mActivityData.get(i));
-        mHistoryToAdd.setPoints(mHistoryToAdd.getQuantity() * mHistoryToAdd.getActivity().points);
+        mHistoryToAdd.setPoints(mHistoryToAdd.getQuantity() * mHistoryToAdd.getActivity().getPoints());
         // update points label
         final int ACTIVITY_TYPE_REWARD = getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
         final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
         TextView pointTotalLabel = (TextView) mDialogView.findViewById(R.id.add_activity_point_total_label);
 
-        if (mHistoryToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+        if (mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
             pointTotalLabel.setText(getString(R.string.reward_point_label, mHistoryToAdd.getPoints()));
             pointTotalLabel.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPointDown));
-        } else if (mHistoryToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
+        } else if (mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_ACTIVITY) {
             pointTotalLabel.setText(getString(R.string.activity_point_label, mHistoryToAdd.getPoints()));
             pointTotalLabel.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPointUp));
         }
 
         // disable log button if not enough points
         if (mHistoryToAdd.getPoints() > mUser.getPoints() &&
-                mHistoryToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+                mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
             mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         } else {
             mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
@@ -186,7 +192,7 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
         }
 
         // recalculate points
-        mHistoryToAdd.setPoints(mHistoryToAdd.getQuantity() * mHistoryToAdd.getActivity().points);
+        mHistoryToAdd.setPoints(mHistoryToAdd.getQuantity() * mHistoryToAdd.getActivity().getPoints());
 
         // update amount label
         TextView amountLabel = (TextView) mDialogView.findViewById(R.id.add_activity_amount_label);
@@ -197,17 +203,17 @@ public class FragmentActivityLog extends DialogFragment implements AdapterView.O
         final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
         TextView pointTotalLabel = (TextView) mDialogView.findViewById(R.id.add_activity_point_total_label);
 
-        if (mHistoryToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+        if (mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
             pointTotalLabel.setText(getString(R.string.reward_point_label, mHistoryToAdd.getPoints()));
             pointTotalLabel.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPointDown));
-        } else if (mHistoryToAdd.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
+        } else if (mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_ACTIVITY) {
             pointTotalLabel.setText(getString(R.string.activity_point_label, mHistoryToAdd.getPoints()));
             pointTotalLabel.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPointUp));
         }
 
         // disable log button if not enough points
         if (mHistoryToAdd.getPoints() > mUser.getPoints() &&
-                mHistoryToAdd.getActivity().type == ACTIVITY_TYPE_REWARD) {
+                mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
             mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
         } else {
             mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);

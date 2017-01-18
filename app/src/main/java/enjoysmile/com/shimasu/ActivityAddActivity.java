@@ -19,13 +19,11 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import io.realm.Realm;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 public class ActivityAddActivity extends AppCompatActivity {
-    private MenuItem activitySaveButton;
-
     private boolean edit_mode;
     private Activity activity;
 
@@ -60,11 +58,15 @@ public class ActivityAddActivity extends AppCompatActivity {
             // populate activity with the passed activity
             TextInputEditText activityName = (TextInputEditText) findViewById(R.id.activity_add_name);
             TextInputEditText activityDescription = (TextInputEditText) findViewById(R.id.activity_add_description);
-            activityName.setText(activity.name);
-            activityDescription.setText(activity.description);
+            activityName.setText(activity.getName());
+            activityDescription.setText(activity.getDescription());
         } else {
             // default activity object
-            activity = new Activity(1, null, null, getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY), 1, true);
+            activity = new Activity();
+            activity.setId(1);
+            activity.setType(getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY));
+            activity.setPoints(1);
+            activity.setRepeatable(true);
         }
 
 
@@ -76,10 +78,10 @@ public class ActivityAddActivity extends AppCompatActivity {
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddActivity.this);
                 builder.setTitle("Activity type")
-                        .setSingleChoiceItems(activityTypes, activity.type, new DialogInterface.OnClickListener() { // default is activity
+                        .setSingleChoiceItems(activityTypes, activity.getType(), new DialogInterface.OnClickListener() { // default is activity
                             public void onClick(DialogInterface dialog, int item) {
                                 // set activity types
-                                activity.type = item;
+                                activity.setType(item);
 
                                 // reconfigure activity type selector
                                 configureActivityType();
@@ -106,11 +108,11 @@ public class ActivityAddActivity extends AppCompatActivity {
                 // set the points field
                 final EditText pointValue = (EditText) dialogView.findViewById(R.id.point_value);
                 pointValue.setText("");
-                pointValue.append(Integer.toString(activity.points)); // set cursor to end
+                pointValue.append(Integer.toString(activity.getPoints())); // set cursor to end
 
                 // set the repeat toggle
                 final CheckBox canRepeat = (CheckBox) dialogView.findViewById(R.id.can_repeat_toggle);
-                canRepeat.setChecked(activity.repeatable);
+                canRepeat.setChecked(activity.isRepeatable());
 
                 builder.setView(dialogView)
                         .setTitle("Activity points")
@@ -118,8 +120,8 @@ public class ActivityAddActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                                 // update the activity with these selections
-                                activity.points = Integer.parseInt(pointValue.getText().toString());
-                                activity.repeatable = canRepeat.isChecked();
+                                activity.setPoints(Integer.parseInt(pointValue.getText().toString()));
+                                activity.setRepeatable(canRepeat.isChecked());
 
                                 //reconfigure activity points selector
                                 configureActivityPoints();
@@ -158,8 +160,8 @@ public class ActivityAddActivity extends AppCompatActivity {
         String[] activityTypesDescription = getResources().getStringArray(R.array.activity_types_description);
 
         // set text
-        activityTypeLabel.setText(activityTypes[activity.type]);
-        activityTypeSubtitle.setText(activityTypesDescription[activity.type]);
+        activityTypeLabel.setText(activityTypes[activity.getType()]);
+        activityTypeSubtitle.setText(activityTypesDescription[activity.getType()]);
     }
 
     private void configureActivityPoints() {
@@ -172,15 +174,15 @@ public class ActivityAddActivity extends AppCompatActivity {
 
         // build point string
         String pointString;
-        if (activity.points == 1) {
+        if (activity.getPoints() == 1) {
             pointString = getString(R.string.point);
         } else {
             pointString = getString(R.string.point_plural);
         }
 
         // set text
-        pointAmountLabel.setText(activity.points + " " + pointString);
-        pointRepeatLabel.setText(repeatableDescription[activity.repeatable ? 1 : 0]);
+        pointAmountLabel.setText(activity.getPoints() + " " + pointString);
+        pointRepeatLabel.setText(repeatableDescription[activity.isRepeatable() ? 1 : 0]);
     }
 
     @Override
@@ -193,9 +195,6 @@ public class ActivityAddActivity extends AppCompatActivity {
             // show the delete button
             menu.findItem(R.id.action_activity_delete).setVisible(true);
         }
-
-        // call validate input
-        activitySaveButton = menu.findItem(R.id.action_activity_save);
         return true;
     }
 
@@ -213,7 +212,7 @@ public class ActivityAddActivity extends AppCompatActivity {
                             Realm.init(getApplicationContext());
                             Realm realm = Realm.getDefaultInstance();
                             realm.beginTransaction();
-                            RealmResults<Activity> _a = realm.where(Activity.class).equalTo("id", activity.id).findAll();
+                            RealmResults<Activity> _a = realm.where(Activity.class).equalTo("id", activity.getId()).findAll();
                             _a.deleteFirstFromRealm();
                             realm.commitTransaction();
                             realm.close();
@@ -235,8 +234,8 @@ public class ActivityAddActivity extends AppCompatActivity {
             // activity name and description
             TextInputEditText activityName = (TextInputEditText) findViewById(R.id.activity_add_name);
             TextInputEditText activityDescription = (TextInputEditText) findViewById(R.id.activity_add_description);
-            activity.name = activityName.getText().toString();
-            activity.description = activityDescription.getText().toString();
+            activity.setName(activityName.getText().toString());
+            activity.setDescription(activityDescription.getText().toString());
 
             // add the activity to realm
             Realm.init(getApplicationContext());
@@ -245,13 +244,13 @@ public class ActivityAddActivity extends AppCompatActivity {
 
             if (edit_mode) {
                 // if we're editing, don't create a new object
-                RealmResults<Activity> _a = realm.where(Activity.class).equalTo("id", activity.id).findAll();
+                RealmResults<Activity> _a = realm.where(Activity.class).equalTo("id", activity.getId()).findAll();
                 Activity toReplace = _a.first();
                 toReplace = activity;
                 realm.copyToRealmOrUpdate(toReplace);
             } else {
                 // new object, we need to get a new ID
-                activity.id = realm.where(Activity.class).count() + 1;
+                activity.setId(realm.where(Activity.class).count() + 1);
                 realm.copyToRealm(activity);
             }
 

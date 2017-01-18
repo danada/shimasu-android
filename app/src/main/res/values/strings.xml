@@ -8,6 +8,29 @@
     <string name="activity_point_label">▲ %1$d</string>
     <string name="reward_point_label">▼ %1$d</string>
 
+    <!-- activity_add -->
+    <string name="activity_add_name_hint">Name</string>
+    <string name="activity_add_description_hint">Description</string>
+
+    <!-- dialog_fragment_add_activity -->
+    <string name="dialog_fragment_add_activity_activity_label">Activity</string>
+    <string name="dialog_fragment_add_activity_amount_label">Amount</string>
+    <string name="dialog_fragment_add_activity_amount_decrease_button">-</string>
+    <string name="dialog_fragment_add_activity_amount_increase_button">+</string>
+    <string name="dialog_fragment_add_activity_point_label">Points</string>
+    <string name="dialog_fragment_add_activity_log_button">Log</string>
+    <string name="dialog_fragment_add_activity_cancel_button">Cancel</string>
+    <string name="dialog_fragment_add_activity_title">Log Activity</string>
+
+    <!-- overview_activity -->
+    <string name="overview_activity_delete_activity_message">Remove log entry?</string>
+    <string name="overview_activity_delete_activity_remove_button">Remove</string>
+    <string name="overview_activity_delete_activity_cancel_button">Cancel</string>
+
+    <!-- menu_activity_add -->
+    <string name="menu_activity_add_save">Save</string>
+    <string name="menu_activity_add_delete">Delete</string>
+
     <string-array name="activity_types">
         <item>Activity</item>
         <item>Reward</item>

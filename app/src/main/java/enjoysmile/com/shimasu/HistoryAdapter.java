@@ -82,7 +82,6 @@ class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     HistoryAdapter(List<History> activityDataset, ItemClickedListener itemClickedListener) {
         mHistoryData = activityDataset;
         mItemClickedListener = itemClickedListener;
-
     }
 
     @Override
@@ -107,34 +106,34 @@ class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if (getItemViewType(position) == -1) { // date row
             SubheadingViewHolder holder = (SubheadingViewHolder) h;
             TextView subheadingLabel = holder.getSubheadingLabel();
-            subheadingLabel.setText(mHistoryData.get(position).getActivity().name);
+            subheadingLabel.setText(mHistoryData.get(position).getActivity().getName());
         } else { // history row
             ViewHolder holder = (ViewHolder) h;
 
             // activity name
             TextView tv = holder.getTextView();
-            tv.setText(_history.getActivity().name);
+            tv.setText(_history.getActivity().getName());
 
             TextView activityIconText = holder.getActivityIconText();
-            activityIconText.setText(_history.getActivity().name.substring(0, 1).toUpperCase());
+            activityIconText.setText(_history.getActivity().getName().substring(0, 1).toUpperCase());
 
             TextView activityPointLabel = holder.getActivityPointLabel();
 
             // set subtitle
             TextView textViewSubtitle = holder.getTextViewSubtitle();
-            textViewSubtitle.setText(_history.getActivity().description +
+            textViewSubtitle.setText(_history.getActivity().getDescription() +
                     " × " +
                     _history.getQuantity());
 
             final int ACTIVITY_TYPE_REWARD = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
             final int ACTIVITY_TYPE_ACTIVITY = tv.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
 
-            if (_history.getActivity().type == ACTIVITY_TYPE_REWARD) {
+            if (_history.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
                 activityPointLabel.setText(tv.getContext().getString(R.string.activity_point_label, _history.getPoints()));
                 activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
                 PorterDuffColorFilter activityFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
                 holder.getActivityIcon().setColorFilter(activityFilter);
-            } else if (_history.getActivity().type == ACTIVITY_TYPE_ACTIVITY) {
+            } else if (_history.getActivity().getType() == ACTIVITY_TYPE_ACTIVITY) {
                 activityPointLabel.setText(tv.getContext().getString(R.string.reward_point_label, _history.getPoints()));
                 activityPointLabel.setTextColor(ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
                 PorterDuffColorFilter rewardFilter = new PorterDuffColorFilter(ContextCompat.getColor(tv.getContext(), R.color.colorPrimary), PorterDuff.Mode.MULTIPLY);
@@ -145,7 +144,7 @@ class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (mHistoryData.get(position).getActivity().id == -1) {
+        if (mHistoryData.get(position).getActivity().getId() == -1) {
             return -1;
         } else {
             return 0;

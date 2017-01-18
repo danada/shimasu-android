@@ -1,12 +1,8 @@
 package enjoysmile.com.shimasu;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +12,18 @@ import java.util.List;
 
 /**
  * Created by Daniel on 12/14/2016.
+ *
  */
 
-public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Activity> mActivities;
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    private class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView activityLabel;
         private final TextView activitySubtitle;
         private final TextView activityPointLabel;
 
-        public ViewHolder(View v) {
+        ViewHolder(View v) {
             super(v);
 
             // Define click listener for the ViewHolder's View.
@@ -38,7 +35,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     // set edit mode flag
                     intent.putExtra("edit_mode", true);
                     // set activity id
-                    intent.putExtra("activity_id", mActivities.get(getAdapterPosition()).id);
+                    intent.putExtra("activity_id", mActivities.get(getAdapterPosition()).getId());
                     // start the activity
                     ((android.app.Activity) v.getContext()).startActivityForResult(intent,
                             v.getContext().getResources().getInteger(R.integer.EDIT_ACTIVITY_REQUEST));
@@ -50,25 +47,25 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             activityPointLabel = (TextView) v.findViewById(R.id.activityPointLabel);
         }
 
-        public TextView getActivityLabel() { return activityLabel; }
-        public TextView getActivitySubtitle() { return activitySubtitle; }
-        public TextView getActivityPointLabel() { return activityPointLabel; }
+        TextView getActivityLabel() { return activityLabel; }
+        TextView getActivitySubtitle() { return activitySubtitle; }
+        TextView getActivityPointLabel() { return activityPointLabel; }
     }
 
-    public class SubheadingViewHolder extends RecyclerView.ViewHolder {
+    private class SubheadingViewHolder extends RecyclerView.ViewHolder {
         private final TextView subheadingLabel;
 
-        public SubheadingViewHolder(View v) {
+        SubheadingViewHolder(View v) {
             super(v);
 
             subheadingLabel = (TextView) v.findViewById(R.id.subheadingLabel);
         }
 
-        public TextView getSubheadingLabel() { return subheadingLabel; }
+        TextView getSubheadingLabel() { return subheadingLabel; }
     }
 
     // constructor
-    public ActivityAdapter(List<Activity> activities) {
+    ActivityAdapter(List<Activity> activities) {
         mActivities = activities;
 
         buildHeaders();
@@ -78,27 +75,21 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (mActivities.size() > 0) {
             // add type divider
             for (int i = 0; i < mActivities.size(); i++) {
+                Activity activityTypeHeader = new Activity();
+                activityTypeHeader.setId(-1);
+                activityTypeHeader.setType(mActivities.get(i).getType());
+
                 // first header
                 if (i == 0) {
                     // add reward header
-                    mActivities.add(0, new Activity(-1,
-                            null,
-                            "",
-                            mActivities.get(i).type,
-                            0,
-                            false));
+                    mActivities.add(0, activityTypeHeader);
                 } else {
                     // second header (if necessary)
                     if (i < mActivities.size() && // if there's another activity after this
-                            mActivities.get(i - 1).id != -1 && mActivities.get(i).id != -1 && // if the last or current row not header
-                            (mActivities.get(i).type != mActivities.get(i - 1).type)) { // if this type doesn't equal previous type
+                            mActivities.get(i - 1).getId() != -1 && mActivities.get(i).getId() != -1 && // if the last or current row not header
+                            (mActivities.get(i).getType() != mActivities.get(i - 1).getType())) { // if this type doesn't equal previous type
                         // add reward header
-                        mActivities.add(i, new Activity(-1,
-                                null,
-                                "",
-                                mActivities.get(i).type,
-                                0,
-                                false));
+                        mActivities.add(i, activityTypeHeader);
                     }
                 }
             }
@@ -129,16 +120,16 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             TextView subheadingLabel = holder.getSubheadingLabel();
             // get activity type string from ID
             String[] activity_types = subheadingLabel.getResources().getStringArray(R.array.activity_types);
-            subheadingLabel.setText(activity_types[_activity.type]);
+            subheadingLabel.setText(activity_types[_activity.getType()]);
         } else { // activity row
             ViewHolder holder = (ViewHolder) h;
             // activity label
             TextView activityLabel = holder.getActivityLabel();
-            activityLabel.setText(_activity.name);
+            activityLabel.setText(_activity.getName());
 
             // activity subtitle
             TextView activitySubtitle = holder.getActivitySubtitle();
-            activitySubtitle.setText(_activity.description);
+            activitySubtitle.setText(_activity.getDescription());
 
             // activity points
             TextView activityPointLabel = holder.getActivityPointLabel();
@@ -146,11 +137,11 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             final int ACTIVITY_TYPE_REWARD = activityPointLabel.getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
             final int ACTIVITY_TYPE_ACTIVITY = activityPointLabel.getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
 
-            if (_activity.type == ACTIVITY_TYPE_REWARD) {
-                activityPointLabel.setText("▼ " + _activity.points);
+            if (_activity.getType() == ACTIVITY_TYPE_REWARD) {
+                activityPointLabel.setText(activityPointLabel.getContext().getString(R.string.activity_point_label, _activity.getPoints()));
                 activityPointLabel.setTextColor(ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointDown));
-            } else if (_activity.type == ACTIVITY_TYPE_ACTIVITY) {
-                activityPointLabel.setText("▲ " + _activity.points);
+            } else if (_activity.getType() == ACTIVITY_TYPE_ACTIVITY) {
+                activityPointLabel.setText(activityPointLabel.getContext().getString(R.string.reward_point_label, _activity.getPoints()));
                 activityPointLabel.setTextColor(ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointUp));
             }
         }
@@ -158,7 +149,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemViewType(int position) {
-        if (mActivities.get(position).id == -1) {
+        if (mActivities.get(position).getId() == -1) {
             return -1;
         } else {
             return 0;
@@ -168,7 +159,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemCount() { return mActivities.size(); }
 
-    public void updateAdapter(List<Activity> activities) {
+    void updateAdapter(List<Activity> activities) {
         this.mActivities = activities;
 
         buildHeaders();

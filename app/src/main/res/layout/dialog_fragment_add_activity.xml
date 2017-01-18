@@ -13,7 +13,7 @@
         android:fontFamily="sans-serif-medium"
         android:textSize="14sp"
         android:textColor="@color/colorPrimary"
-        android:text="Activity"/>
+        android:text="@string/dialog_fragment_add_activity_activity_label"/>
     <Spinner
         android:id="@+id/add_activity_spinner"
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
         android:fontFamily="sans-serif-medium"
         android:textSize="14sp"
         android:textColor="@color/colorPrimary"
-        android:text="Amount"/>
+        android:text="@string/dialog_fragment_add_activity_amount_label"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -35,13 +35,12 @@
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:text="-"/>
+            android:text="@string/dialog_fragment_add_activity_amount_decrease_button"/>
         <TextView
             android:id="@+id/add_activity_amount_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="1"/>
+            android:layout_centerInParent="true"/>
         <Button
             android:id="@+id/add_activity_amount_increase"
             android:layout_width="wrap_content"
@@ -49,7 +48,7 @@
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:text="+"/>
+            android:text="@string/dialog_fragment_add_activity_amount_increase_button"/>
     </RelativeLayout>
     <TextView
         android:layout_width="wrap_content"
@@ -57,12 +56,11 @@
         android:fontFamily="sans-serif-medium"
         android:textSize="14sp"
         android:textColor="@color/colorPrimary"
-        android:text="Points"/>
+        android:text="@string/dialog_fragment_add_activity_point_label"/>
     <TextView
         android:id="@+id/add_activity_point_total_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text="1"/>
+        android:padding="8dp"/>
 
 </LinearLayout>

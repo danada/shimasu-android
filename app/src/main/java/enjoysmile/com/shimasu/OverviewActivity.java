@@ -3,6 +3,7 @@ package enjoysmile.com.shimasu;
 import android.app.ActivityManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -95,9 +97,9 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
             FloatingActionButton _fab = new FloatingActionButton(getBaseContext());
 
             // customize button's appearance
-            _fab.setLabelText(activityData.get(i).name);
+            _fab.setLabelText(activityData.get(i).getName());
             _fab.setButtonSize(FloatingActionButton.SIZE_MINI);
-            if (activityData.get(i).type == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
+            if (activityData.get(i).getType() == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
                 _fab.setColorNormalResId(R.color.colorAccent);
                 _fab.setColorPressedResId(R.color.colorAccentDark);
             } else {
@@ -105,7 +107,7 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                 _fab.setColorPressedResId(R.color.colorPrimaryDark);
             }
             // set the button drawable
-            _fab.setImageDrawable(makeLetterDrawable(activityData.get(i).name.substring(0, 1)));
+            _fab.setImageDrawable(makeLetterDrawable(activityData.get(i).getName().substring(0, 1)));
 
 
             // hang onto this activity's index
@@ -184,7 +186,7 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
 
                 if (i == 0) { // first header
                     insertDateRow(i, mHistoryData.get(i).getDate());
-                } else if (mHistoryData.get(i - 1).getActivity().id != -1) { // if previous item is not a date
+                } else if (mHistoryData.get(i - 1).getActivity().getId() != -1) { // if previous item is not a date
                     // get previous date number
                     _calendar.setTimeInMillis(mHistoryData.get(i - 1).getDate());
                     // check if previous item's date is different
@@ -197,12 +199,17 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
     }
 
     protected BitmapDrawable makeLetterDrawable(String text) {
-        Bitmap bitmap = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888);
+        int bitmapSize = 20;
+        Resources r = getResources();
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, bitmapSize, r.getDisplayMetrics());
+
+        Bitmap bitmap = Bitmap.createBitmap(px, px, Bitmap.Config.ARGB_8888);
         Paint paint = new Paint();
+        paint.setFlags(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.WHITE);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(64);
+        paint.setTextSize(px);
 
 
         Canvas canvas = new Canvas(bitmap);
@@ -233,19 +240,17 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                 DateUtils.DAY_IN_MILLIS).toString();
 
         // build activity (holds date)
-        Activity _a = new Activity(
-                -1,
-                _dateString,
-                "",
-                -1,
-                0,
-                false);
+        Activity _a = new Activity();
+        _a.setId(-1);
+        _a.setName(_dateString);
+        _a.setType(-1);
+
         // build history object (notifies adapter of date row)
         History _h = new History();
         _h.setId("-1");
         _h.setActivity(_a);
         _h.setQuantity(0);
-        _h.setDate(0);
+        _h.setDate(date);
         _h.setPoints(0);
 
         // add date header
@@ -290,7 +295,7 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         int difference = mHistoryData.get(clickedItemPosition).getPoints() *
-                                (mHistoryData.get(clickedItemPosition).getActivity().type ==
+                                (mHistoryData.get(clickedItemPosition).getActivity().getType() ==
                                         getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD) ? 1 : -1);
                         updateUserPoints(difference);
 
@@ -308,9 +313,9 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                         if (mHistoryData.size() == 1) {
                             mHistoryData.remove(0);
                             mActivityAdapter.notifyItemRemoved(0);
-                        } else if (mHistoryData.get(clickedItemPosition - 1).getActivity().type == -1 && // if sandwiched by dates
+                        } else if (mHistoryData.get(clickedItemPosition - 1).getActivity().getType() == -1 && // if sandwiched by dates
                                 mHistoryData.size() > clickedItemPosition + 1 &&
-                                mHistoryData.get(clickedItemPosition).getActivity().type == -1) {
+                                mHistoryData.get(clickedItemPosition).getActivity().getType() == -1) {
                             // remove the leading date object
                             mHistoryData.remove(clickedItemPosition - 1);
                             mActivityAdapter.notifyItemRemoved(clickedItemPosition - 1);
@@ -320,34 +325,42 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
             }
         };
 
+        // build the dialog for removing an activity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Remove log entry?").setPositiveButton("Remove", dialogClickListener)
-                .setNegativeButton("Cancel", dialogClickListener).show();
+        builder.setMessage(getString(R.string.overview_activity_delete_activity_message))
+                .setPositiveButton(getString(R.string.overview_activity_delete_activity_remove_button), dialogClickListener)
+                .setNegativeButton(getString(R.string.overview_activity_delete_activity_cancel_button), dialogClickListener)
+                .show();
     }
 
     @Override
     public void onActivityLogged(History historyToAdd) {
         // update points label
         int difference = historyToAdd.getPoints() *
-                (historyToAdd.getActivity().type ==
+                (historyToAdd.getActivity().getType() ==
                         getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD) ? -1 : 1);
         updateUserPoints(difference);
-
-
-
 
         String _dateString = DateUtils.getRelativeTimeSpanString(
                 historyToAdd.getDate(),
                 System.currentTimeMillis(),
                 DateUtils.DAY_IN_MILLIS).toString();
 
+
+
         // if first item
         if (mHistoryData.size() == 0) {
             insertDateRow(0, historyToAdd.getDate());
-        } else if (mHistoryData.size() > 0 &&
-                !mHistoryData.get(0).getActivity().name.equals(_dateString)) {
-            // insert a date row
-            insertDateRow(0, historyToAdd.getDate());
+        } else if (mHistoryData.size() > 0) {
+            String _firstDateString = DateUtils.getRelativeTimeSpanString(
+                    mHistoryData.get(0).getDate(),
+                    System.currentTimeMillis(),
+                    DateUtils.DAY_IN_MILLIS).toString();
+
+            if(!_firstDateString.equals(_dateString)) {
+                // insert a date row
+                insertDateRow(0, historyToAdd.getDate());
+            }
         }
 
         mHistoryData.add(1, historyToAdd);
