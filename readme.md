@@ -2,7 +2,7 @@
 
 Shimasu is an application with the goal of balancing the good and not-so-good things in your life.
 
-## This Shimasu can help you accomplish
+## Things Shimasu can help you accomplish
 * stay on track on your diet
 * study more frequently
 * improve your sleep quality
