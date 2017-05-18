@@ -357,6 +357,12 @@ public class OverviewActivity extends AppCompatActivity implements HistoryAdapte
                     System.currentTimeMillis(),
                     DateUtils.DAY_IN_MILLIS).toString();
 
+            // TODO - if the user has the application open past midnight...
+            // weird stuff happens, and even though the top row will say TODAY,
+            // new activities will still go unto the TODAY label, even though
+            // the existing TODAY label is actually YESTERDAY
+            // maybe look into refreshing all the labels FIRST (notify update)
+            // then adding the new row
             if(!_firstDateString.equals(_dateString)) {
                 // insert a date row
                 insertDateRow(0, historyToAdd.getDate());
