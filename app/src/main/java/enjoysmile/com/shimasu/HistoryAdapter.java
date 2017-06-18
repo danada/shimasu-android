@@ -142,7 +142,7 @@ class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
       if (_history.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
         activityPointLabel.setText(
-            tv.getContext().getString(R.string.activity_point_label, _history.getPoints()));
+            tv.getContext().getString(R.string.reward_point_label, _history.getPoints()));
         activityPointLabel.setTextColor(
             ContextCompat.getColor(tv.getContext(), R.color.colorPointDown));
         PorterDuffColorFilter activityFilter =
@@ -152,7 +152,7 @@ class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.getActivityIcon().setColorFilter(activityFilter);
       } else if (_history.getActivity().getType() == ACTIVITY_TYPE_ACTIVITY) {
         activityPointLabel.setText(
-            tv.getContext().getString(R.string.reward_point_label, _history.getPoints()));
+            tv.getContext().getString(R.string.activity_point_label, _history.getPoints()));
         activityPointLabel.setTextColor(
             ContextCompat.getColor(tv.getContext(), R.color.colorPointUp));
         PorterDuffColorFilter rewardFilter =

@@ -165,14 +165,14 @@ class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         activityPointLabel.setText(
             activityPointLabel
                 .getContext()
-                .getString(R.string.activity_point_label, _activity.getPoints()));
+                .getString(R.string.reward_point_label, _activity.getPoints()));
         activityPointLabel.setTextColor(
             ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointDown));
       } else if (_activity.getType() == ACTIVITY_TYPE_ACTIVITY) {
         activityPointLabel.setText(
             activityPointLabel
                 .getContext()
-                .getString(R.string.reward_point_label, _activity.getPoints()));
+                .getString(R.string.activity_point_label, _activity.getPoints()));
         activityPointLabel.setTextColor(
             ContextCompat.getColor(activityLabel.getContext(), R.color.colorPointUp));
       }
