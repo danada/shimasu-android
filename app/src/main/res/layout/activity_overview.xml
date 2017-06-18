@@ -25,10 +25,12 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="bottom|center_horizontal"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal">
+
                 <TextView
                     android:id="@+id/point_total"
                     android:layout_width="wrap_content"
@@ -38,6 +40,7 @@
                     android:textColor="@android:color/white"
                     android:paddingTop="36dp"
                     app:layout_collapseMode="pin"/>
+
                 <TextView
                     android:id="@+id/point_subtitle"
                     android:layout_width="wrap_content"
@@ -48,7 +51,6 @@
                     android:textColor="@android:color/white"
                     app:layout_collapseMode="pin"/>
             </RelativeLayout>
-
 
 
             <android.support.v7.widget.Toolbar
@@ -81,7 +83,6 @@
         fab:menu_colorPressed="@color/colorPrimaryVeryDark"
         fab:menu_colorRipple="@color/colorPrimaryDark">
     </com.github.clans.fab.FloatingActionMenu>
-
 
 
 </android.support.design.widget.CoordinatorLayout>

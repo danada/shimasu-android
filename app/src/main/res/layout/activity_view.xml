@@ -5,11 +5,13 @@
                 android:paddingTop="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_height="72dp">
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:layout_centerVertical="true">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -17,6 +19,7 @@
             android:textSize="16sp"
             android:textColor="#DE000000"
             android:id="@+id/activityLabel"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,6 +28,7 @@
             android:textColor="#8A000000"
             android:id="@+id/activitySubtitle"
             android:layout_below="@id/activityLabel"/>
+
         <TextView
             android:id="@+id/activityPointLabel"
             android:layout_width="wrap_content"

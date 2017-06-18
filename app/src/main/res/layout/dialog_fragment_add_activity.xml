@@ -7,6 +7,7 @@
               android:paddingLeft="24dp"
               android:paddingBottom="24dp"
               android:paddingRight="24dp">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,10 +15,12 @@
         android:textSize="14sp"
         android:textColor="@color/colorPrimary"
         android:text="@string/dialog_fragment_add_activity_activity_label"/>
+
     <Spinner
         android:id="@+id/add_activity_spinner"
         android:layout_width="match_parent"
         android:layout_height="48dp"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,9 +28,11 @@
         android:textSize="14sp"
         android:textColor="@color/colorPrimary"
         android:text="@string/dialog_fragment_add_activity_amount_label"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <Button
             android:id="@+id/add_activity_amount_decrease"
             android:layout_width="wrap_content"
@@ -36,11 +41,13 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:text="@string/dialog_fragment_add_activity_amount_decrease_button"/>
+
         <TextView
             android:id="@+id/add_activity_amount_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>
+
         <Button
             android:id="@+id/add_activity_amount_increase"
             android:layout_width="wrap_content"
@@ -50,6 +57,7 @@
             android:layout_alignParentEnd="true"
             android:text="@string/dialog_fragment_add_activity_amount_increase_button"/>
     </RelativeLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,6 +65,7 @@
         android:textSize="14sp"
         android:textColor="@color/colorPrimary"
         android:text="@string/dialog_fragment_add_activity_point_label"/>
+
     <TextView
         android:id="@+id/add_activity_point_total_label"
         android:layout_width="wrap_content"
