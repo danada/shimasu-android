@@ -7,71 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import java.util.List;
 
-/** Created by Daniel on 12/14/2016. */
+/*
+ * Copyright (c) 2017 enjoy|smile. All Rights Reserved.
+ */
 class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
   private List<Activity> mActivities;
-
-  private class ViewHolder extends RecyclerView.ViewHolder {
-    private final TextView activityLabel;
-    private final TextView activitySubtitle;
-    private final TextView activityPointLabel;
-
-    ViewHolder(View v) {
-      super(v);
-
-      // Define click listener for the ViewHolder's View.
-      v.setOnClickListener(
-          new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              // start edit intent
-              Intent intent = new Intent(v.getContext(), ActivityAddActivity.class);
-              // set edit mode flag
-              intent.putExtra("edit_mode", true);
-              // set activity id
-              intent.putExtra("activity_id", mActivities.get(getAdapterPosition()).getId());
-              // start the activity
-              ((android.app.Activity) v.getContext())
-                  .startActivityForResult(
-                      intent,
-                      v.getContext().getResources().getInteger(R.integer.EDIT_ACTIVITY_REQUEST));
-            }
-          });
-
-      activityLabel = (TextView) v.findViewById(R.id.activityLabel);
-      activitySubtitle = (TextView) v.findViewById(R.id.activitySubtitle);
-      activityPointLabel = (TextView) v.findViewById(R.id.activityPointLabel);
-    }
-
-    TextView getActivityLabel() {
-      return activityLabel;
-    }
-
-    TextView getActivitySubtitle() {
-      return activitySubtitle;
-    }
-
-    TextView getActivityPointLabel() {
-      return activityPointLabel;
-    }
-  }
-
-  private class SubheadingViewHolder extends RecyclerView.ViewHolder {
-    private final TextView subheadingLabel;
-
-    SubheadingViewHolder(View v) {
-      super(v);
-
-      subheadingLabel = (TextView) v.findViewById(R.id.subheadingLabel);
-    }
-
-    TextView getSubheadingLabel() {
-      return subheadingLabel;
-    }
-  }
 
   // constructor
   ActivityAdapter(List<Activity> activities) {
@@ -198,5 +140,64 @@ class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     buildHeaders();
     notifyDataSetChanged();
+  }
+
+  private class ViewHolder extends RecyclerView.ViewHolder {
+    private final TextView activityLabel;
+    private final TextView activitySubtitle;
+    private final TextView activityPointLabel;
+
+    ViewHolder(View v) {
+      super(v);
+
+      // Define click listener for the ViewHolder's View.
+      v.setOnClickListener(
+          new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              // start edit intent
+              Intent intent = new Intent(v.getContext(), ActivityAddActivity.class);
+              // set edit mode flag
+              intent.putExtra("edit_mode", true);
+              // set activity id
+              intent.putExtra("activity_id", mActivities.get(getAdapterPosition()).getId());
+              // start the activity
+              ((android.app.Activity) v.getContext())
+                  .startActivityForResult(
+                      intent,
+                      v.getContext().getResources().getInteger(R.integer.EDIT_ACTIVITY_REQUEST));
+            }
+          });
+
+      activityLabel = v.findViewById(R.id.activityLabel);
+      activitySubtitle = v.findViewById(R.id.activitySubtitle);
+      activityPointLabel = v.findViewById(R.id.activityPointLabel);
+    }
+
+    TextView getActivityLabel() {
+      return activityLabel;
+    }
+
+    TextView getActivitySubtitle() {
+      return activitySubtitle;
+    }
+
+    TextView getActivityPointLabel() {
+      return activityPointLabel;
+    }
+  }
+
+  private class SubheadingViewHolder extends RecyclerView.ViewHolder {
+    private final TextView subheadingLabel;
+
+    SubheadingViewHolder(View v) {
+      super(v);
+
+      subheadingLabel = v.findViewById(R.id.subheadingLabel);
+    }
+
+    TextView getSubheadingLabel() {
+      return subheadingLabel;
+    }
   }
 }

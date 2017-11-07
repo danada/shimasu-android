@@ -12,14 +12,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -31,10 +29,12 @@ public class ActivityAddActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_add);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    getSupportActionBar().setDisplayShowTitleEnabled(false);
+    if (getSupportActionBar() != null) {
+      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+      getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
 
     Intent intent = getIntent();
     edit_mode = intent.getBooleanExtra("edit_mode", false);
@@ -54,9 +54,8 @@ public class ActivityAddActivity extends AppCompatActivity {
       activity = realm.copyFromRealm(_a.first());
       realm.close();
       // populate activity with the passed activity
-      TextInputEditText activityName = (TextInputEditText) findViewById(R.id.activity_add_name);
-      TextInputEditText activityDescription =
-          (TextInputEditText) findViewById(R.id.activity_add_description);
+      TextInputEditText activityName = findViewById(R.id.activity_add_name);
+      TextInputEditText activityDescription = findViewById(R.id.activity_add_description);
       activityName.setText(activity.getName());
       activityDescription.setText(activity.getDescription());
     } else {
@@ -106,16 +105,19 @@ public class ActivityAddActivity extends AppCompatActivity {
           @Override
           public void onClick(View view) {
             AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddActivity.this);
-            LayoutInflater inflater = getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.dialog_fragment_point_selector, null);
+            //View dialogView = getLayoutInflater().inflate(R.layout.dialog_fragment_point_selector, null, false);
+
+            View dialogView =
+                View.inflate(
+                    getApplicationContext(), R.layout.dialog_fragment_point_selector, null);
 
             // set the points field
-            final EditText pointValue = (EditText) dialogView.findViewById(R.id.point_value);
+            final EditText pointValue = dialogView.findViewById(R.id.point_value);
             pointValue.setText("");
             pointValue.append(Integer.toString(activity.getPoints())); // set cursor to end
 
             // set the repeat toggle
-            final CheckBox canRepeat = (CheckBox) dialogView.findViewById(R.id.can_repeat_toggle);
+            final CheckBox canRepeat = dialogView.findViewById(R.id.can_repeat_toggle);
             canRepeat.setChecked(activity.isRepeatable());
 
             builder
@@ -163,8 +165,8 @@ public class ActivityAddActivity extends AppCompatActivity {
 
   private void configureActivityType() {
     // find views
-    TextView activityTypeLabel = (TextView) findViewById(R.id.activity_type_label);
-    TextView activityTypeSubtitle = (TextView) findViewById(R.id.activity_type_subtitle);
+    TextView activityTypeLabel = findViewById(R.id.activity_type_label);
+    TextView activityTypeSubtitle = findViewById(R.id.activity_type_subtitle);
 
     // get string arrays from resources
     String[] activityTypes = getResources().getStringArray(R.array.activity_types);
@@ -178,8 +180,8 @@ public class ActivityAddActivity extends AppCompatActivity {
 
   private void configureActivityPoints() {
     //find views
-    TextView pointAmountLabel = (TextView) findViewById(R.id.point_amount_label);
-    TextView pointRepeatLabel = (TextView) findViewById(R.id.point_repeat_label);
+    TextView pointAmountLabel = findViewById(R.id.point_amount_label);
+    TextView pointRepeatLabel = findViewById(R.id.point_repeat_label);
 
     // get string arrays from resources
     String[] repeatableDescription = getResources().getStringArray(R.array.repeatable_description);
@@ -193,7 +195,10 @@ public class ActivityAddActivity extends AppCompatActivity {
     }
 
     // set text
-    pointAmountLabel.setText(activity.getPoints() + " " + pointString);
+    pointAmountLabel.setText(
+        getResources()
+            .getString(
+                R.string.activity_add_point_amount_label, activity.getPoints(), pointString));
     pointRepeatLabel.setText(repeatableDescription[activity.isRepeatable() ? 1 : 0]);
   }
 
@@ -250,9 +255,8 @@ public class ActivityAddActivity extends AppCompatActivity {
 
     if (id == R.id.action_activity_save) {
       // activity name and description
-      TextInputEditText activityName = (TextInputEditText) findViewById(R.id.activity_add_name);
-      TextInputEditText activityDescription =
-          (TextInputEditText) findViewById(R.id.activity_add_description);
+      TextInputEditText activityName = findViewById(R.id.activity_add_name);
+      TextInputEditText activityDescription = findViewById(R.id.activity_add_description);
       activity.setName(activityName.getText().toString());
       activity.setDescription(activityDescription.getText().toString());
 
@@ -263,11 +267,13 @@ public class ActivityAddActivity extends AppCompatActivity {
 
       if (edit_mode) {
         // if we're editing, don't create a new object
-        RealmResults<Activity> _a =
-            realm.where(Activity.class).equalTo("id", activity.getId()).findAll();
-        Activity toReplace = _a.first();
-        toReplace = activity;
-        realm.copyToRealmOrUpdate(toReplace);
+        Activity toUpdate = realm.where(Activity.class).equalTo("id", activity.getId()).findFirst();
+        toUpdate.setName(activity.getName());
+        toUpdate.setDescription(activity.getDescription());
+        toUpdate.setType(activity.getType());
+        toUpdate.setPoints(activity.getPoints());
+        toUpdate.setRepeatable(activity.isRepeatable());
+        realm.copyToRealmOrUpdate(toUpdate);
       } else {
         // new object, we need to get a new ID
         activity.setId(realm.where(Activity.class).count() + 1);

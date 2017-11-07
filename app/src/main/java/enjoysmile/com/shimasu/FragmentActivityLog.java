@@ -8,23 +8,22 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import java.util.Locale;
-import java.util.UUID;
-
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import java.util.Locale;
+import java.util.UUID;
 
-/** Created by Daniel on 1/15/2017. */
+/*
+ * Copyright (c) 2017 enjoy|smile. All Rights Reserved.
+ */
 public class FragmentActivityLog extends DialogFragment
     implements AdapterView.OnItemSelectedListener, View.OnClickListener {
   private AlertDialog mDialog;
@@ -34,10 +33,6 @@ public class FragmentActivityLog extends DialogFragment
   private User mUser;
   private Realm realm;
   private ActivityLoggedListener mActivityLoggedListener;
-
-  interface ActivityLoggedListener extends Parcelable {
-    void onActivityLogged(History historyToAdd);
-  }
 
   public static FragmentActivityLog newInstance(
       int activityIndex, ActivityLoggedListener activityLoggedListener) {
@@ -83,8 +78,9 @@ public class FragmentActivityLog extends DialogFragment
     mHistoryToAdd.setPoints(mActivityData.get(getArguments().getInt("activityIndex")).getPoints());
 
     // build the view
-    LayoutInflater inflater = getActivity().getLayoutInflater();
-    mDialogView = inflater.inflate(R.layout.dialog_fragment_add_activity, null);
+    mDialogView =
+        View.inflate(
+            getActivity().getApplicationContext(), R.layout.dialog_fragment_add_activity, null);
 
     // build the dialog
     mDialog =
@@ -121,17 +117,17 @@ public class FragmentActivityLog extends DialogFragment
             .create();
 
     // build amount buttons
-    Button amountDecrease = (Button) mDialogView.findViewById(R.id.add_activity_amount_decrease);
-    Button amountIncrease = (Button) mDialogView.findViewById(R.id.add_activity_amount_increase);
+    Button amountDecrease = mDialogView.findViewById(R.id.add_activity_amount_decrease);
+    Button amountIncrease = mDialogView.findViewById(R.id.add_activity_amount_increase);
     amountDecrease.setOnClickListener(this);
     amountIncrease.setOnClickListener(this);
 
     // set the quantity
-    TextView amountTextView = (TextView) mDialogView.findViewById(R.id.add_activity_amount_label);
+    TextView amountTextView = mDialogView.findViewById(R.id.add_activity_amount_label);
     amountTextView.setText(String.format(Locale.getDefault(), "%d", mHistoryToAdd.getQuantity()));
 
     // build activity spinner
-    Spinner spinner = (Spinner) mDialogView.findViewById(R.id.add_activity_spinner);
+    Spinner spinner = mDialogView.findViewById(R.id.add_activity_spinner);
     ArrayAdapter<String> spinnerArrayAdapter =
         new ArrayAdapter<>(
             getActivity(),
@@ -152,8 +148,7 @@ public class FragmentActivityLog extends DialogFragment
     // update points label
     final int ACTIVITY_TYPE_REWARD = getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
     final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
-    TextView pointTotalLabel =
-        (TextView) mDialogView.findViewById(R.id.add_activity_point_total_label);
+    TextView pointTotalLabel = mDialogView.findViewById(R.id.add_activity_point_total_label);
 
     if (mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
       pointTotalLabel.setText(getString(R.string.reward_point_label, mHistoryToAdd.getPoints()));
@@ -193,14 +188,13 @@ public class FragmentActivityLog extends DialogFragment
     mHistoryToAdd.setPoints(mHistoryToAdd.getQuantity() * mHistoryToAdd.getActivity().getPoints());
 
     // update amount label
-    TextView amountLabel = (TextView) mDialogView.findViewById(R.id.add_activity_amount_label);
+    TextView amountLabel = mDialogView.findViewById(R.id.add_activity_amount_label);
     amountLabel.setText(String.format(Locale.getDefault(), "%d", mHistoryToAdd.getQuantity()));
 
     // update points label
     final int ACTIVITY_TYPE_REWARD = getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD);
     final int ACTIVITY_TYPE_ACTIVITY = getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY);
-    TextView pointTotalLabel =
-        (TextView) mDialogView.findViewById(R.id.add_activity_point_total_label);
+    TextView pointTotalLabel = mDialogView.findViewById(R.id.add_activity_point_total_label);
 
     if (mHistoryToAdd.getActivity().getType() == ACTIVITY_TYPE_REWARD) {
       pointTotalLabel.setText(getString(R.string.reward_point_label, mHistoryToAdd.getPoints()));
@@ -228,7 +222,6 @@ public class FragmentActivityLog extends DialogFragment
       User newUser = new User();
       newUser.setId(UUID.randomUUID().toString());
       newUser.setPoints(0);
-      newUser.setLastUpdated(System.currentTimeMillis());
       realm.copyToRealmOrUpdate(newUser);
       realm.commitTransaction();
 
@@ -237,5 +230,9 @@ public class FragmentActivityLog extends DialogFragment
       // return our current user
       return userResults.first();
     }
+  }
+
+  interface ActivityLoggedListener extends Parcelable {
+    void onActivityLogged(History historyToAdd);
   }
 }

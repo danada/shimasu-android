@@ -1,5 +1,6 @@
 package enjoysmile.com.shimasu;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,19 +27,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
-
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.UUID;
-
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.UUID;
 
+@SuppressLint("ParcelCreator")
 public class OverviewActivity extends AppCompatActivity
     implements HistoryAdapter.ItemClickedListener, FragmentActivityLog.ActivityLoggedListener {
 
@@ -56,11 +55,11 @@ public class OverviewActivity extends AppCompatActivity
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_overview);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
     // recycler view
-    mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
+    mActivityRecyclerView = findViewById(R.id.activity_recycler_view);
     // use a linear layout manager
     final RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
     mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
@@ -93,7 +92,7 @@ public class OverviewActivity extends AppCompatActivity
     mActivityRecyclerView.setAdapter(mActivityAdapter);
 
     // build floating action menu
-    mFloatingActionMenu = (FloatingActionMenu) findViewById(R.id.multiple_actions);
+    mFloatingActionMenu = findViewById(R.id.multiple_actions);
 
     for (int i = 0; i < activityData.size(); i++) {
       FloatingActionButton _fab = new FloatingActionButton(getBaseContext());
@@ -171,7 +170,6 @@ public class OverviewActivity extends AppCompatActivity
       User newUser = new User();
       newUser.setId(UUID.randomUUID().toString());
       newUser.setPoints(0);
-      newUser.setLastUpdated(System.currentTimeMillis());
       realm.copyToRealmOrUpdate(newUser);
       realm.commitTransaction();
 
@@ -235,8 +233,8 @@ public class OverviewActivity extends AppCompatActivity
     realm.commitTransaction();
 
     // update the toolbar
-    TextView pointTotal = (TextView) findViewById(R.id.point_total);
-    TextView pointSubtitle = (TextView) findViewById(R.id.point_subtitle);
+    TextView pointTotal = findViewById(R.id.point_total);
+    TextView pointSubtitle = findViewById(R.id.point_subtitle);
     pointTotal.setText(String.format(Locale.getDefault(), "%d", mUser.getPoints()));
     pointSubtitle.setText(
         mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));

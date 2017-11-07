@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="enjoysmile.com.shimasu"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="enjoysmile.com.shimasu">
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -13,9 +14,16 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="shimasu"
+                    android:scheme="overview" />
             </intent-filter>
         </activity>
         <activity
@@ -25,7 +33,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="enjoysmile.com.shimasu.OverviewActivity"/>
+                android:value="enjoysmile.com.shimasu.OverviewActivity" />
         </activity>
         <activity
             android:name=".ActivityAddActivity"
@@ -34,7 +42,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="enjoysmile.com.shimasu.ActivityManageActivity"/>
+                android:value="enjoysmile.com.shimasu.ActivityManageActivity" />
         </activity>
     </application>
 

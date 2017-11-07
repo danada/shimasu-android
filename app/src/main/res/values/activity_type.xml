@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="ACTIVITY_TYPE_SUBHEADING">-1</integer>
     <integer name="ACTIVITY_TYPE_ACTIVITY">0</integer>
     <integer name="ACTIVITY_TYPE_REWARD">1</integer>
 </resources>

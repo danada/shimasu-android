@@ -3,7 +3,9 @@ package enjoysmile.com.shimasu;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-/** Created by Daniel on 12/7/2016. */
+/*
+ * Copyright (c) 2017 enjoy|smile. All Rights Reserved.
+ */
 public class History extends RealmObject {
   @PrimaryKey private String id;
   private Activity activity;
@@ -27,19 +29,19 @@ public class History extends RealmObject {
     this.activity = activity;
   }
 
-  public int getQuantity() {
+  int getQuantity() {
     return quantity;
   }
 
-  public void setQuantity(int quantity) {
+  void setQuantity(int quantity) {
     this.quantity = quantity;
   }
 
-  public long getDate() {
+  long getDate() {
     return date;
   }
 
-  public void setDate(long date) {
+  void setDate(long date) {
     this.date = date;
   }
 

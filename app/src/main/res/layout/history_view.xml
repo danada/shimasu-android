@@ -1,69 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:paddingTop="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_height="72dp">
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:layout_marginTop="8dp"
+    android:orientation="vertical"
+    android:paddingTop="8dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_centerVertical="true">
+        android:paddingRight="16dp">
 
         <ImageView
             android:id="@+id/activity_icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:contentDescription="@string/history_view_activity_icon_description"
             android:padding="4dp"
-            android:src="@drawable/activity_icon"/>
+            android:src="@drawable/activity_icon" />
 
         <TextView
             android:id="@+id/activity_icon_text"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:padding="4dp"
             android:gravity="center"
+            android:padding="4dp"
             android:textColor="@android:color/white"
-            android:textSize="20sp"/>
+            android:textSize="20sp" />
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="72dp"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:paddingEnd="72dp"
+        android:paddingStart="72dp">
 
         <TextView
+            android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:textSize="16sp"
             android:textColor="#DE000000"
-            android:id="@+id/textView"/>
+            android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/textViewSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/textView"
             android:fontFamily="sans-serif"
-            android:textSize="14sp"
             android:textColor="#8A000000"
-            android:id="@+id/textViewSubtitle"
-            android:layout_below="@id/textView"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/activityPointLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/textView"
             android:layout_alignParentEnd="true"
-            android:paddingRight="20dp"
+            android:layout_toEndOf="@+id/textView"
             android:paddingEnd="20dp"
             android:paddingLeft="20dp"
-            android:paddingStart="20dp"
-            android:layout_alignBaseline="@id/textView"/>
+            android:paddingRight="20dp"
+            android:paddingStart="20dp" />
 
     </RelativeLayout>
 </RelativeLayout>

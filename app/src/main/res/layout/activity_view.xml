@@ -1,46 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:paddingTop="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_height="72dp">
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:layout_centerVertical="true"
+    android:layout_marginTop="8dp"
+    android:orientation="vertical"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="8dp">
 
-    <RelativeLayout
+    <TextView
+        android:id="@+id/activityLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textColor="#DE000000"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/activitySubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activityLabel"
+        android:fontFamily="sans-serif"
+        android:textColor="#8A000000"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/activityPointLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:layout_centerVertical="true">
+        android:layout_alignBaseline="@id/activityLabel"
+        android:layout_toEndOf="@id/activityLabel"
+        android:layout_alignParentEnd="true"
+        android:paddingEnd="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingStart="20dp"
+        android:textColor="#DE000000" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:textSize="16sp"
-            android:textColor="#DE000000"
-            android:id="@+id/activityLabel"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:textSize="14sp"
-            android:textColor="#8A000000"
-            android:id="@+id/activitySubtitle"
-            android:layout_below="@id/activityLabel"/>
-
-        <TextView
-            android:id="@+id/activityPointLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:paddingRight="20dp"
-            android:paddingEnd="20dp"
-            android:paddingLeft="20dp"
-            android:paddingStart="20dp"
-            android:textColor="#DE000000"
-            android:layout_alignBaseline="@id/activityLabel"/>
-
-    </RelativeLayout>
 </RelativeLayout>

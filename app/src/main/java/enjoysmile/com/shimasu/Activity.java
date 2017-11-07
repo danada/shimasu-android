@@ -30,11 +30,11 @@ public class Activity extends RealmObject {
     this.name = name;
   }
 
-  public String getDescription() {
+  String getDescription() {
     return description;
   }
 
-  public void setDescription(String description) {
+  void setDescription(String description) {
     this.description = description;
   }
 
@@ -54,11 +54,11 @@ public class Activity extends RealmObject {
     this.points = points;
   }
 
-  public boolean isRepeatable() {
+  boolean isRepeatable() {
     return repeatable;
   }
 
-  public void setRepeatable(boolean repeatable) {
+  void setRepeatable(boolean repeatable) {
     this.repeatable = repeatable;
   }
 }

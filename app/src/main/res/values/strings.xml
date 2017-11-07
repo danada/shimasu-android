@@ -11,6 +11,9 @@
     <!-- activity_add -->
     <string name="activity_add_name_hint">Name</string>
     <string name="activity_add_description_hint">Description</string>
+    <string name="activity_add_type_label_description">Type</string>
+    <string name="activity_add_point_label_description">Points</string>
+    <string name="activity_add_point_amount_label">%d %s</string>
 
     <!-- dialog_fragment_add_activity -->
     <string name="dialog_fragment_add_activity_activity_label">Activity</string>
@@ -22,10 +25,20 @@
     <string name="dialog_fragment_add_activity_cancel_button">Cancel</string>
     <string name="dialog_fragment_add_activity_title">Log Activity</string>
 
+    <!-- dialog_fragment_point_selector -->
+    <string name="dialog_fragment_point_selector_point_value_hint">Points</string>
+    <string name="dialog_fragment_point_selector_can_repeat_toggle_label">Can repeat</string>
+
     <!-- overview_activity -->
     <string name="overview_activity_delete_activity_message">Remove log entry?</string>
     <string name="overview_activity_delete_activity_remove_button">Remove</string>
     <string name="overview_activity_delete_activity_cancel_button">Cancel</string>
+
+    <!-- history_view -->
+    <string name="history_view_activity_icon_description">Activity Icon</string>
+
+    <!-- history_row -->
+    <string name="history_row_point_amount_label">%s x %d</string>
 
     <!-- menu_activity_add -->
     <string name="menu_activity_add_save">Save</string>

@@ -3,11 +3,12 @@ package enjoysmile.com.shimasu;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-/** Created by Daniel on 1/9/2017. */
+/*
+ * Copyright (c) 2017 enjoy|smile. All Rights Reserved.
+ */
 public class User extends RealmObject {
   @PrimaryKey private String id;
   private int points;
-  private long lastUpdated;
 
   public String getId() {
     return id;
@@ -23,13 +24,5 @@ public class User extends RealmObject {
 
   public void setPoints(int points) {
     this.points = points;
-  }
-
-  public long getLastUpdated() {
-    return lastUpdated;
-  }
-
-  public void setLastUpdated(long lastUpdated) {
-    this.lastUpdated = lastUpdated;
   }
 }

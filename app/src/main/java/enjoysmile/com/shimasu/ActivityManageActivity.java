@@ -12,19 +12,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-
 import com.github.clans.fab.FloatingActionButton;
-
-import java.util.List;
-
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import java.util.List;
 
 public class ActivityManageActivity extends AppCompatActivity {
-  private RecyclerView mActivityRecyclerView;
   private ActivityAdapter mActivityAdapter;
-  private RecyclerView.LayoutManager mActivityLayoutManager;
 
   private List<Activity> activities;
 
@@ -32,11 +27,12 @@ public class ActivityManageActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_manage);
-    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    if (getSupportActionBar() != null) {
+      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
-    // get
     Realm.init(getApplicationContext());
     Realm realm = Realm.getDefaultInstance();
     // get activities, order by type
@@ -44,18 +40,17 @@ public class ActivityManageActivity extends AppCompatActivity {
     activities = realm.copyFromRealm(_a);
     realm.close();
 
-    mActivityRecyclerView = (RecyclerView) findViewById(R.id.activity_recycler_view);
+    RecyclerView mActivityRecyclerView = findViewById(R.id.activity_recycler_view);
 
     // use a linear layout manager
-    mActivityLayoutManager = new LinearLayoutManager(this);
+    RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
     mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
 
     mActivityAdapter = new ActivityAdapter(activities);
     mActivityRecyclerView.setAdapter(mActivityAdapter);
 
     // bind add button
-    final FloatingActionButton addActivityButton =
-        (FloatingActionButton) findViewById(R.id.add_activity_button);
+    final FloatingActionButton addActivityButton = findViewById(R.id.add_activity_button);
     addActivityButton.setOnClickListener(
         new View.OnClickListener() {
           @Override

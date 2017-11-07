@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:paddingTop="20dp"
-              android:paddingLeft="24dp"
-              android:paddingBottom="24dp"
-              android:paddingRight="24dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="24dp"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp"
+    android:paddingTop="20dp">
 
     <!-- Point edit text -->
     <android.support.design.widget.TextInputLayout
@@ -17,8 +17,8 @@
             android:id="@+id/point_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="Points"/>
+            android:hint="@string/dialog_fragment_point_selector_point_value_hint"
+            android:inputType="numberDecimal" />
     </android.support.design.widget.TextInputLayout>
 
     <!-- Can repeat toggle -->
@@ -27,6 +27,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Can repeat"/>
+        android:text="@string/dialog_fragment_point_selector_can_repeat_toggle_label" />
 
 </LinearLayout>

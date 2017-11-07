@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -22,30 +21,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="72dp"
-                android:paddingRight="16dp"
+                android:paddingEnd="16dp"
+                android:paddingStart="72dp"
                 android:theme="@style/AddActivityHeaderInput">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/activity_add_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/activity_add_name_hint"
                     android:inputType="textCapSentences"
-                    android:textSize="34sp"
-                    android:hint="@string/activity_add_name_hint"/>
+                    android:textSize="34sp" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="72dp"
-                android:paddingRight="16dp"
                 android:paddingBottom="32dp"
+                android:paddingEnd="16dp"
+                android:paddingStart="72dp"
                 android:paddingTop="26dp"
                 android:theme="@style/AddActivityHeaderInput">
 
@@ -53,9 +52,9 @@
                     android:id="@+id/activity_add_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="@string/activity_add_description_hint"
                     android:inputType="textCapSentences"
-                    android:textSize="16sp"
-                    android:hint="@string/activity_add_description_hint"/>
+                    android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
 
         </android.support.design.widget.AppBarLayout>
@@ -68,94 +67,90 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingTop="8dp">
 
                 <!-- Activity type -->
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/activity_type_selector"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="72dp">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="72dp">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@string/activity_add_type_label_description"
+                        android:paddingEnd="16dp"
+                        android:paddingStart="16dp"
+                        android:src="@drawable/ic_label_black_24px" />
 
-                        <ImageView
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/activity_type_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingLeft="16dp"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/ic_label_black_24px"/>
+                            android:paddingEnd="72dp"
+                            android:paddingStart="72dp"
+                            android:textColor="#E7000000" />
 
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/activity_type_subtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:orientation="vertical">
+                            android:paddingEnd="72dp"
+                            android:paddingStart="72dp"
+                            android:textColor="#61000000"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/activity_type_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#E7000000"
-                                android:paddingLeft="72dp"/>
-
-                            <TextView
-                                android:id="@+id/activity_type_subtitle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#61000000"
-                                android:textSize="14sp"
-                                android:paddingLeft="72dp"/>
-                        </LinearLayout>
-
-                    </RelativeLayout>
-                </LinearLayout>
+                </RelativeLayout>
 
                 <!-- Activity points -->
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/activity_point_selector"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="72dp">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="72dp">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="@string/activity_add_point_label_description"
+                        android:paddingEnd="16dp"
+                        android:paddingStart="16dp"
+                        android:src="@drawable/ic_swap_vert_black_24px" />
 
-                        <ImageView
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/point_amount_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:paddingLeft="16dp"
-                            android:layout_centerVertical="true"
-                            android:src="@drawable/ic_swap_vert_black_24px"/>
+                            android:paddingEnd="72dp"
+                            android:paddingStart="72dp"
+                            android:textColor="#E7000000" />
 
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/point_repeat_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:orientation="vertical">
+                            android:paddingEnd="72dp"
+                            android:paddingStart="72dp"
+                            android:textColor="#61000000"
+                            android:textSize="14sp" />
+                    </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/point_amount_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#E7000000"
-                                android:paddingLeft="72dp"/>
-
-                            <TextView
-                                android:id="@+id/point_repeat_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textColor="#61000000"
-                                android:textSize="14sp"
-                                android:paddingLeft="72dp"/>
-                        </LinearLayout>
-
-                    </RelativeLayout>
-                </LinearLayout>
+                </RelativeLayout>
             </LinearLayout>
 
         </ScrollView>
