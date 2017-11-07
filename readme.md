@@ -1,4 +1,4 @@
-# Shimasu
+# Shimasu [![Build Status](https://travis-ci.org/danada/shimasu-android.svg?branch=master "Build Status")](https://travis-ci.org/danada/shimasu-android)
 
 Shimasu is an application with the goal of balancing the good and not-so-good things in your life.
 
