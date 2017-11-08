@@ -7,4 +7,8 @@ android:
     - android-26
     - sys-img-armeabi-v7a-android-26
     - sys-img-armeabi-v7a-android-18
-
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+    
