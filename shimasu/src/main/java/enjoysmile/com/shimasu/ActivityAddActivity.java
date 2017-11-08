@@ -105,11 +105,10 @@ public class ActivityAddActivity extends AppCompatActivity {
           @Override
           public void onClick(View view) {
             AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddActivity.this);
-            //View dialogView = getLayoutInflater().inflate(R.layout.dialog_fragment_point_selector, null, false);
 
             View dialogView =
                 View.inflate(
-                    getApplicationContext(), R.layout.dialog_fragment_point_selector, null);
+                    ActivityAddActivity.this, R.layout.dialog_fragment_point_selector, null);
 
             // set the points field
             final EditText pointValue = dialogView.findViewById(R.id.point_value);
@@ -132,7 +131,7 @@ public class ActivityAddActivity extends AppCompatActivity {
                         activity.setPoints(Integer.parseInt(pointValue.getText().toString()));
                         activity.setRepeatable(canRepeat.isChecked());
 
-                        //reconfigure activity points selector
+                        // reconfigure activity points selector
                         configureActivityPoints();
 
                         dialog.dismiss();
@@ -179,7 +178,7 @@ public class ActivityAddActivity extends AppCompatActivity {
   }
 
   private void configureActivityPoints() {
-    //find views
+    // find views
     TextView pointAmountLabel = findViewById(R.id.point_amount_label);
     TextView pointRepeatLabel = findViewById(R.id.point_repeat_label);
 
