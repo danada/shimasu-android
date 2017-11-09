@@ -183,10 +183,11 @@ public class OverviewActivity extends AppCompatActivity
 
     // Remove points.
     updateUserPoints(
-        history.getPoints() * history.getActivity().getType()
-                == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)
-            ? 1
-            : -1);
+        history.getPoints()
+            * (history.getActivity().getType()
+                    == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)
+                ? 1
+                : -1));
 
     // Remove from realm.
     realm.beginTransaction();
@@ -241,7 +242,7 @@ public class OverviewActivity extends AppCompatActivity
       dateRow.setActivity(activity);
 
       // Add the header to the data set.
-      mHistoryData.add(dateRow);
+      mHistoryData.add(0, dateRow);
       mActivityAdapter.notifyItemInserted(0);
 
       // Add the new activity.
@@ -262,7 +263,7 @@ public class OverviewActivity extends AppCompatActivity
             .toString();
 
     // If the 0th row is a date row and different from the activity's date.
-    if (!previousItem.getId().equals("-1") && !previousDateString.equals(dateString)) {
+    if (previousItem.getId().equals("-1") && !previousDateString.equals(dateString)) {
       // Create an empty activity with this date.
       Activity activity = new Activity();
       activity.setName(dateString);
@@ -270,15 +271,16 @@ public class OverviewActivity extends AppCompatActivity
       // Create history with an ID of -1 so it is rendered as a subheading.
       History dateRow = new History();
       dateRow.setId("-1");
+      dateRow.setDate(history.getDate());
       dateRow.setActivity(activity);
 
       // Add the header to the data set.
-      mHistoryData.add(dateRow);
+      mHistoryData.add(0, dateRow);
       mActivityAdapter.notifyItemInserted(0);
     }
 
     // Add the new activity.
-    mHistoryData.add(history);
+    mHistoryData.add(1, history);
     mActivityAdapter.notifyItemInserted(1);
   }
 
@@ -379,10 +381,10 @@ public class OverviewActivity extends AppCompatActivity
     // update points label
     int difference =
         historyToAdd.getPoints()
-            * (historyToAdd.getActivity().getType()
+            * ((historyToAdd.getActivity().getType()
                     == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)
                 ? -1
-                : 1);
+                : 1));
 
     updateUserPoints(difference);
     addHistory(historyToAdd);

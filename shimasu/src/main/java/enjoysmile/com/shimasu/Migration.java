@@ -20,6 +20,11 @@ public class Migration implements RealmMigration {
       if (activitySchema != null) {
         activitySchema.addField("deleted", boolean.class);
       }
+
+      RealmObjectSchema userSchema = schema.get("User");
+      if (userSchema != null) {
+        userSchema.removeField("lastUpdated");
+      }
     }
   }
 }
