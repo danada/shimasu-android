@@ -108,7 +108,7 @@ class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
   @Override
   public int getItemViewType(int position) {
-    if (mHistoryData.get(position).getActivity().getId() == -1) {
+    if (mHistoryData.get(position).getId().equals("-1")) {
       return -1;
     } else {
       return 0;

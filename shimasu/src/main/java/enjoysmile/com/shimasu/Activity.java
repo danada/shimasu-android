@@ -11,6 +11,7 @@ public class Activity extends RealmObject {
   private int type;
   private int points;
   private boolean repeatable;
+  private boolean deleted;
 
   public Activity() {}
 
@@ -60,5 +61,13 @@ public class Activity extends RealmObject {
 
   void setRepeatable(boolean repeatable) {
     this.repeatable = repeatable;
+  }
+
+  boolean isDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
   }
 }

@@ -18,6 +18,8 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -48,7 +50,6 @@ public class FragmentActivityLog extends DialogFragment
   @Override
   @NonNull
   public Dialog onCreateDialog(Bundle savedInstanceState) {
-    Realm.init(getActivity());
     realm = Realm.getDefaultInstance();
 
     // bind listener
@@ -61,12 +62,12 @@ public class FragmentActivityLog extends DialogFragment
     RealmResults<Activity> activityResult =
         realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
     mActivityData = new RealmList<>();
-    mActivityData.addAll(activityResult.subList(0, activityResult.size()));
+    mActivityData.addAll(activityResult);
 
     // build the mActivityData array
-    String[] activityArray = new String[mActivityData.size()];
-    for (int i = 0; i < mActivityData.size(); i++) {
-      activityArray[i] = mActivityData.get(i).getName();
+    List<String> activityNames = new ArrayList<>();
+    for (Activity activity : mActivityData) {
+      activityNames.add(activity.getName());
     }
 
     // build history object
@@ -132,7 +133,8 @@ public class FragmentActivityLog extends DialogFragment
         new ArrayAdapter<>(
             getActivity(),
             android.R.layout.simple_spinner_item,
-            activityArray); //selected item will look like a spinner set from XML
+            activityNames.toArray(
+                new String[0])); //selected item will look like a spinner set from XML
     spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(spinnerArrayAdapter);
     spinner.setSelection(getArguments().getInt("activityIndex")); // set default selected index

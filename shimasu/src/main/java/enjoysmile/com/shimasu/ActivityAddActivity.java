@@ -19,7 +19,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class ActivityAddActivity extends AppCompatActivity {
   private boolean edit_mode;
@@ -45,14 +44,15 @@ public class ActivityAddActivity extends AppCompatActivity {
     // if editing
     if (edit_mode) {
       // get the id from the intent (or just pass the entire object)
-      long activityId = intent.getLongExtra("activity_id", 0);
-      // get
       Realm.init(getApplicationContext());
       Realm realm = Realm.getDefaultInstance();
-      // get activities, order by type
-      RealmResults<Activity> _a = realm.where(Activity.class).equalTo("id", activityId).findAll();
-      activity = realm.copyFromRealm(_a.first());
+      activity =
+          realm
+              .where(Activity.class)
+              .equalTo("id", intent.getLongExtra("activity_id", 0))
+              .findFirst();
       realm.close();
+
       // populate activity with the passed activity
       TextInputEditText activityName = findViewById(R.id.activity_add_name);
       TextInputEditText activityDescription = findViewById(R.id.activity_add_description);
@@ -65,6 +65,7 @@ public class ActivityAddActivity extends AppCompatActivity {
       activity.setType(getResources().getInteger(R.integer.ACTIVITY_TYPE_ACTIVITY));
       activity.setPoints(1);
       activity.setRepeatable(true);
+      activity.setDeleted(false);
     }
 
     // configure activity type selector
@@ -76,6 +77,7 @@ public class ActivityAddActivity extends AppCompatActivity {
           public void onClick(View view) {
             AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddActivity.this);
             builder
+                // TODO: stringify.
                 .setTitle("Activity type")
                 .setSingleChoiceItems(
                     activityTypes,
@@ -121,8 +123,10 @@ public class ActivityAddActivity extends AppCompatActivity {
 
             builder
                 .setView(dialogView)
+                // TODO: stringify.
                 .setTitle("Activity points")
                 .setPositiveButton(
+                    // TODO: stringify.
                     "Ok",
                     new DialogInterface.OnClickListener() {
                       @Override
@@ -138,6 +142,7 @@ public class ActivityAddActivity extends AppCompatActivity {
                       }
                     })
                 .setNegativeButton(
+                    // TODO: stringify.
                     "Cancel",
                     new DialogInterface.OnClickListener() {
                       public void onClick(DialogInterface dialog, int id) {
@@ -221,19 +226,24 @@ public class ActivityAddActivity extends AppCompatActivity {
     if (id == R.id.action_activity_delete) {
       AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddActivity.this);
       builder
+          // TODO: stringify.
           .setMessage("Delete this activity?")
           .setPositiveButton(
               "Erase",
               new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
-                  // delete this activity
+                  // Mark this activity as deleted.
                   Realm.init(getApplicationContext());
                   Realm realm = Realm.getDefaultInstance();
                   realm.beginTransaction();
-                  RealmResults<Activity> _a =
-                      realm.where(Activity.class).equalTo("id", activity.getId()).findAll();
-                  _a.deleteFirstFromRealm();
+                  Activity toUpdate =
+                      realm.where(Activity.class).equalTo("id", activity.getId()).findFirst();
+                  if (toUpdate == null) {
+                    return;
+                  }
+                  toUpdate.setDeleted(true);
+                  realm.copyToRealmOrUpdate(toUpdate);
                   realm.commitTransaction();
                   realm.close();
                   finish();
@@ -241,6 +251,7 @@ public class ActivityAddActivity extends AppCompatActivity {
                 }
               })
           .setNegativeButton(
+              // TODO: stringify.
               "Cancel",
               new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -267,11 +278,16 @@ public class ActivityAddActivity extends AppCompatActivity {
       if (edit_mode) {
         // if we're editing, don't create a new object
         Activity toUpdate = realm.where(Activity.class).equalTo("id", activity.getId()).findFirst();
+        if (toUpdate == null) {
+          return false;
+        }
+
         toUpdate.setName(activity.getName());
         toUpdate.setDescription(activity.getDescription());
         toUpdate.setType(activity.getType());
         toUpdate.setPoints(activity.getPoints());
         toUpdate.setRepeatable(activity.isRepeatable());
+        toUpdate.setDeleted(activity.isDeleted());
         realm.copyToRealmOrUpdate(toUpdate);
       } else {
         // new object, we need to get a new ID

@@ -30,10 +30,10 @@ import android.widget.TextView;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -44,7 +44,7 @@ public class OverviewActivity extends AppCompatActivity
   private HistoryAdapter mActivityAdapter;
   private RecyclerView mActivityRecyclerView;
 
-  private RealmList<History> mHistoryData;
+  private RealmList<History> mHistoryData = new RealmList<>();
 
   private User mUser;
   private Realm realm;
@@ -64,12 +64,10 @@ public class OverviewActivity extends AppCompatActivity
     final RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
     mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
 
-    // open realm
-    Realm.init(getApplicationContext());
-    //        RealmConfiguration config = new RealmConfiguration.Builder()
-    //                .deleteRealmIfMigrationNeeded()
-    //                .build();
-    //        realm = Realm.getInstance(config);
+    Realm.init(this);
+    RealmConfiguration config =
+        new RealmConfiguration.Builder().schemaVersion(1).migration(new Migration()).build();
+    Realm.setDefaultConfiguration(config);
     realm = Realm.getDefaultInstance();
 
     // initiate user
@@ -78,44 +76,44 @@ public class OverviewActivity extends AppCompatActivity
 
     // get activities
     RealmResults<Activity> activityResult =
-        realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
+        realm.where(Activity.class).equalTo("deleted", false).findAllSorted("type", Sort.ASCENDING);
     RealmList<Activity> activityData = new RealmList<>();
-    activityData.addAll(activityResult.subList(0, activityResult.size()));
+    activityData.addAll(activityResult);
 
-    // get history
-    final RealmResults<History> historyResult =
-        realm.where(History.class).findAllSorted("date", Sort.DESCENDING);
-    mHistoryData = new RealmList<>();
-    mHistoryData.addAll(historyResult.subList(0, historyResult.size()));
     mActivityAdapter = new HistoryAdapter(mHistoryData, this);
-    buildHistoryHeaders();
     mActivityRecyclerView.setAdapter(mActivityAdapter);
+
+    // Get history and add it to the history list.
+    RealmResults<History> historyResult =
+        realm.where(History.class).findAllSorted("date", Sort.ASCENDING);
+    for (History history : historyResult) {
+      addHistory(history);
+    }
 
     // build floating action menu
     mFloatingActionMenu = findViewById(R.id.multiple_actions);
 
-    for (int i = 0; i < activityData.size(); i++) {
-      FloatingActionButton _fab = new FloatingActionButton(getBaseContext());
+    for (Activity activity : activityData) {
+      FloatingActionButton fab = new FloatingActionButton(getBaseContext());
 
       // customize button's appearance
-      _fab.setLabelText(activityData.get(i).getName());
-      _fab.setButtonSize(FloatingActionButton.SIZE_MINI);
-      if (activityData.get(i).getType()
-          == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
-        _fab.setColorNormalResId(R.color.colorAccent);
-        _fab.setColorPressedResId(R.color.colorAccentDark);
+      fab.setLabelText(activity.getName());
+      fab.setButtonSize(FloatingActionButton.SIZE_MINI);
+      if (activity.getType() == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)) {
+        fab.setColorNormalResId(R.color.colorAccent);
+        fab.setColorPressedResId(R.color.colorAccentDark);
       } else {
-        _fab.setColorNormalResId(R.color.colorPrimary);
-        _fab.setColorPressedResId(R.color.colorPrimaryDark);
+        fab.setColorNormalResId(R.color.colorPrimary);
+        fab.setColorPressedResId(R.color.colorPrimaryDark);
       }
       // set the button drawable
-      _fab.setImageDrawable(makeLetterDrawable(activityData.get(i).getName().substring(0, 1)));
+      fab.setImageDrawable(makeLetterDrawable(activity.getName().substring(0, 1)));
 
       // hang onto this activity's index
-      final int selectedIndex = i;
+      final int selectedIndex = activityData.indexOf(activity);
 
       // set the onclick listener
-      _fab.setOnClickListener(
+      fab.setOnClickListener(
           new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,7 +125,7 @@ public class OverviewActivity extends AppCompatActivity
           });
 
       // add the button
-      mFloatingActionMenu.addMenuButton(_fab);
+      mFloatingActionMenu.addMenuButton(fab);
     }
 
     // hide and show the floating menu
@@ -180,27 +178,108 @@ public class OverviewActivity extends AppCompatActivity
     }
   }
 
-  protected void buildHistoryHeaders() {
-    if (mHistoryData.size() > 0) {
-      for (int i = 0; i < mHistoryData.size(); i++) {
-        // get current activity date
-        Calendar _calendar = Calendar.getInstance();
-        _calendar.setTimeInMillis(mHistoryData.get(i).getDate());
-        final int _day = _calendar.get(Calendar.DAY_OF_MONTH);
+  protected void removeHistory(History history) {
+    int historyIndex = mHistoryData.indexOf(history);
 
-        if (i == 0) { // first header
-          insertDateRow(i, mHistoryData.get(i).getDate());
-        } else if (mHistoryData.get(i - 1).getActivity().getId()
-            != -1) { // if previous item is not a date
-          // get previous date number
-          _calendar.setTimeInMillis(mHistoryData.get(i - 1).getDate());
-          // check if previous item's date is different
-          if (_calendar.get(Calendar.DAY_OF_MONTH) != _day) {
-            insertDateRow(i, mHistoryData.get(i).getDate());
-          }
-        }
+    // Remove points.
+    updateUserPoints(
+        history.getPoints() * history.getActivity().getType()
+                == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)
+            ? 1
+            : -1);
+
+    // Remove from realm.
+    realm.beginTransaction();
+    RealmResults<History> historyToDelete =
+        realm.where(History.class).equalTo("id", history.getId()).findAll();
+    historyToDelete.deleteAllFromRealm();
+    realm.commitTransaction();
+
+    // Remove from list.
+    mHistoryData.remove(historyIndex);
+    mActivityAdapter.notifyItemRemoved(historyIndex);
+
+    // If there's only one row left, remove it.
+    if (mHistoryData.size() == 1) {
+      mHistoryData.remove(0);
+      mActivityAdapter.notifyItemRemoved(0);
+
+      return;
+    }
+
+    // If the removed item was between two date rows, remove the row preceding the item.
+    if (mHistoryData.size() > 0 && historyIndex < mHistoryData.size()) {
+      History previousItem = mHistoryData.get(historyIndex - 1);
+      History currentItem = mHistoryData.get(historyIndex);
+      if (previousItem == null || currentItem == null) {
+        return;
+      }
+
+      if (previousItem.getId().equals("-1") && currentItem.getId().equals("-1")) {
+        mHistoryData.remove(previousItem);
+        mActivityAdapter.notifyItemRemoved(historyIndex - 1);
       }
     }
+  }
+
+  protected void addHistory(History history) {
+    // Get the history's date string.
+    String dateString =
+        DateUtils.getRelativeTimeSpanString(
+                history.getDate(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS)
+            .toString();
+
+    // Insert a date row if it doesn't exist yet.
+    if (mHistoryData.size() == 0) {
+      // Create an empty activity with this date.
+      Activity activity = new Activity();
+      activity.setName(dateString);
+
+      // Create history with an ID of -1 so it is rendered as a subheading.
+      History dateRow = new History();
+      dateRow.setId("-1");
+      dateRow.setActivity(activity);
+
+      // Add the header to the data set.
+      mHistoryData.add(dateRow);
+      mActivityAdapter.notifyItemInserted(0);
+
+      // Add the new activity.
+      mHistoryData.add(history);
+      mActivityAdapter.notifyItemInserted(1);
+
+      return;
+    }
+
+    History previousItem = mHistoryData.get(0);
+    if (previousItem == null) {
+      return;
+    }
+
+    String previousDateString =
+        DateUtils.getRelativeTimeSpanString(
+                previousItem.getDate(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS)
+            .toString();
+
+    // If the 0th row is a date row and different from the activity's date.
+    if (!previousItem.getId().equals("-1") && !previousDateString.equals(dateString)) {
+      // Create an empty activity with this date.
+      Activity activity = new Activity();
+      activity.setName(dateString);
+
+      // Create history with an ID of -1 so it is rendered as a subheading.
+      History dateRow = new History();
+      dateRow.setId("-1");
+      dateRow.setActivity(activity);
+
+      // Add the header to the data set.
+      mHistoryData.add(dateRow);
+      mActivityAdapter.notifyItemInserted(0);
+    }
+
+    // Add the new activity.
+    mHistoryData.add(history);
+    mActivityAdapter.notifyItemInserted(1);
   }
 
   protected BitmapDrawable makeLetterDrawable(String text) {
@@ -240,33 +319,6 @@ public class OverviewActivity extends AppCompatActivity
         mUser.getPoints() == 1 ? getString(R.string.point) : getString(R.string.point_plural));
   }
 
-  protected void insertDateRow(int at, long date) {
-    // get current activity date string
-    String _dateString =
-        DateUtils.getRelativeTimeSpanString(
-                date, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS)
-            .toString();
-
-    // build activity (holds date)
-    Activity _a = new Activity();
-    _a.setId(-1);
-    _a.setName(_dateString);
-    _a.setType(-1);
-
-    // build history object (notifies adapter of date row)
-    History _h = new History();
-    _h.setId("-1");
-    _h.setActivity(_a);
-    _h.setQuantity(0);
-    _h.setDate(date);
-    _h.setPoints(0);
-
-    // add date header
-    mHistoryData.add(at, _h);
-    // notify adapter
-    mActivityAdapter.notifyItemInserted(at);
-  }
-
   @Override
   protected void onDestroy() {
     super.onDestroy();
@@ -303,40 +355,7 @@ public class OverviewActivity extends AppCompatActivity
           public void onClick(DialogInterface dialog, int which) {
             switch (which) {
               case DialogInterface.BUTTON_POSITIVE:
-                int difference =
-                    mHistoryData.get(clickedItemPosition).getPoints()
-                        * (mHistoryData.get(clickedItemPosition).getActivity().getType()
-                                == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)
-                            ? 1
-                            : -1);
-                updateUserPoints(difference);
-
-                // remove from realm;
-                realm.beginTransaction();
-                RealmResults<History> _h =
-                    realm
-                        .where(History.class)
-                        .equalTo("id", mHistoryData.get(clickedItemPosition).getId())
-                        .findAll();
-                _h.deleteFirstFromRealm();
-                realm.commitTransaction();
-
-                // remove this item
-                mHistoryData.remove(clickedItemPosition);
-                mActivityAdapter.notifyItemRemoved(clickedItemPosition);
-
-                // if there's only one item left (date) remove it
-                if (mHistoryData.size() == 1) {
-                  mHistoryData.remove(0);
-                  mActivityAdapter.notifyItemRemoved(0);
-                } else if (mHistoryData.get(clickedItemPosition - 1).getActivity().getType() == -1
-                    && // if sandwiched by dates
-                    mHistoryData.size() > clickedItemPosition + 1
-                    && mHistoryData.get(clickedItemPosition).getActivity().getType() == -1) {
-                  // remove the leading date object
-                  mHistoryData.remove(clickedItemPosition - 1);
-                  mActivityAdapter.notifyItemRemoved(clickedItemPosition - 1);
-                }
+                removeHistory(mHistoryData.get(clickedItemPosition));
                 break;
             }
           }
@@ -364,38 +383,9 @@ public class OverviewActivity extends AppCompatActivity
                     == getResources().getInteger(R.integer.ACTIVITY_TYPE_REWARD)
                 ? -1
                 : 1);
+
     updateUserPoints(difference);
-
-    String _dateString =
-        DateUtils.getRelativeTimeSpanString(
-                historyToAdd.getDate(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS)
-            .toString();
-
-    // if first item
-    if (mHistoryData.size() == 0) {
-      insertDateRow(0, historyToAdd.getDate());
-    } else if (mHistoryData.size() > 0) {
-      String _firstDateString =
-          DateUtils.getRelativeTimeSpanString(
-                  mHistoryData.get(0).getDate(),
-                  System.currentTimeMillis(),
-                  DateUtils.DAY_IN_MILLIS)
-              .toString();
-
-      // TODO - if the user has the application open past midnight...
-      // weird stuff happens, and even though the top row will say TODAY,
-      // new activities will still go unto the TODAY label, even though
-      // the existing TODAY label is actually YESTERDAY
-      // maybe look into refreshing all the labels FIRST (notify update)
-      // then adding the new row
-      if (!_firstDateString.equals(_dateString)) {
-        // insert a date row
-        insertDateRow(0, historyToAdd.getDate());
-      }
-    }
-
-    mHistoryData.add(1, historyToAdd);
-    mActivityAdapter.notifyItemInserted(1);
+    addHistory(historyToAdd);
 
     // scroll up
     mActivityRecyclerView.scrollToPosition(0);
