@@ -239,6 +239,7 @@ public class OverviewActivity extends AppCompatActivity
       // Create history with an ID of -1 so it is rendered as a subheading.
       History dateRow = new History();
       dateRow.setId("-1");
+      dateRow.setDate(history.getDate());
       dateRow.setActivity(activity);
 
       // Add the header to the data set.
