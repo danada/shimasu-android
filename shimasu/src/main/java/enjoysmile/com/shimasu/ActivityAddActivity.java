@@ -267,13 +267,14 @@ public class ActivityAddActivity extends AppCompatActivity {
       // activity name and description
       TextInputEditText activityName = findViewById(R.id.activity_add_name);
       TextInputEditText activityDescription = findViewById(R.id.activity_add_description);
-      activity.setName(activityName.getText().toString());
-      activity.setDescription(activityDescription.getText().toString());
 
       // add the activity to realm
       Realm.init(getApplicationContext());
       Realm realm = Realm.getDefaultInstance();
       realm.beginTransaction();
+
+      activity.setName(activityName.getText().toString());
+      activity.setDescription(activityDescription.getText().toString());
 
       if (edit_mode) {
         // if we're editing, don't create a new object
