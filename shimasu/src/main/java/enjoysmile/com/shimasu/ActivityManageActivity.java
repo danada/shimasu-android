@@ -83,12 +83,16 @@ public class ActivityManageActivity extends AppCompatActivity {
     // Check which request we're responding to
     if (requestCode == getResources().getInteger(R.integer.ADD_ACTIVITY_REQUEST)
         || requestCode == getResources().getInteger(R.integer.EDIT_ACTIVITY_REQUEST)) {
-      // get
+
       Realm.init(getApplicationContext());
       Realm realm = Realm.getDefaultInstance();
       // get activities, order by type
       RealmResults<Activity> _a =
-          realm.where(Activity.class).sort("type", Sort.ASCENDING).findAll();
+          realm
+              .where(Activity.class)
+              .equalTo("deleted", false)
+              .sort("type", Sort.ASCENDING)
+              .findAll();
       activities = realm.copyFromRealm(_a);
       realm.close();
       mActivityAdapter.updateAdapter(activities);
