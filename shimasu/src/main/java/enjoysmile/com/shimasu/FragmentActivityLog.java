@@ -60,7 +60,7 @@ public class FragmentActivityLog extends DialogFragment
 
     // get activities
     RealmResults<Activity> activityResult =
-        realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
+        realm.where(Activity.class).sort("type", Sort.ASCENDING).findAll();
     mActivityData = new RealmList<>();
     mActivityData.addAll(activityResult);
 
@@ -134,7 +134,7 @@ public class FragmentActivityLog extends DialogFragment
             getActivity(),
             android.R.layout.simple_spinner_item,
             activityNames.toArray(
-                new String[0])); //selected item will look like a spinner set from XML
+                new String[0])); // selected item will look like a spinner set from XML
     spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(spinnerArrayAdapter);
     spinner.setSelection(getArguments().getInt("activityIndex")); // set default selected index

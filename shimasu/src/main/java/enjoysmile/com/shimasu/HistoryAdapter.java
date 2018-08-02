@@ -20,7 +20,7 @@ class HistoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
   private List<History> mHistoryData;
   private ItemClickedListener mItemClickedListener;
 
-  //provide a constructor
+  // provide a constructor
   HistoryAdapter(List<History> activityDataset, ItemClickedListener itemClickedListener) {
     mHistoryData = activityDataset;
     mItemClickedListener = itemClickedListener;

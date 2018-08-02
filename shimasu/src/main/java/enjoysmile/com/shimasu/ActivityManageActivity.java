@@ -37,7 +37,11 @@ public class ActivityManageActivity extends AppCompatActivity {
     Realm realm = Realm.getDefaultInstance();
     // get activities, order by type
     RealmResults<Activity> _a =
-        realm.where(Activity.class).equalTo("deleted", false).findAllSorted("type", Sort.ASCENDING);
+        realm
+            .where(Activity.class)
+            .equalTo("deleted", false)
+            .sort("type", Sort.ASCENDING)
+            .findAll();
     activities = realm.copyFromRealm(_a);
     realm.close();
 
@@ -83,7 +87,8 @@ public class ActivityManageActivity extends AppCompatActivity {
       Realm.init(getApplicationContext());
       Realm realm = Realm.getDefaultInstance();
       // get activities, order by type
-      RealmResults<Activity> _a = realm.where(Activity.class).findAllSorted("type", Sort.ASCENDING);
+      RealmResults<Activity> _a =
+          realm.where(Activity.class).sort("type", Sort.ASCENDING).findAll();
       activities = realm.copyFromRealm(_a);
       realm.close();
       mActivityAdapter.updateAdapter(activities);

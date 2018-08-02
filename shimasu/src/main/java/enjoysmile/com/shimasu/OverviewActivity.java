@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -76,7 +77,11 @@ public class OverviewActivity extends AppCompatActivity
 
     // get activities
     RealmResults<Activity> activityResult =
-        realm.where(Activity.class).equalTo("deleted", false).findAllSorted("type", Sort.ASCENDING);
+        realm
+            .where(Activity.class)
+            .equalTo("deleted", false)
+            .sort("type", Sort.ASCENDING)
+            .findAll();
     RealmList<Activity> activityData = new RealmList<>();
     activityData.addAll(activityResult);
 
@@ -85,7 +90,7 @@ public class OverviewActivity extends AppCompatActivity
 
     // Get history and add it to the history list.
     RealmResults<History> historyResult =
-        realm.where(History.class).findAllSorted("date", Sort.ASCENDING);
+        realm.where(History.class).sort("date", Sort.ASCENDING).findAll();
     for (History history : historyResult) {
       addHistory(history);
     }
@@ -132,12 +137,12 @@ public class OverviewActivity extends AppCompatActivity
     mActivityRecyclerView.addOnScrollListener(
         new RecyclerView.OnScrollListener() {
           @Override
-          public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+          public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
             super.onScrollStateChanged(recyclerView, newState);
           }
 
           @Override
-          public void onScrolled(RecyclerView view, int dx, int dy) {
+          public void onScrolled(@NonNull RecyclerView view, int dx, int dy) {
             if (dy > 0) {
               mFloatingActionMenu.hideMenuButton(true);
             } else {

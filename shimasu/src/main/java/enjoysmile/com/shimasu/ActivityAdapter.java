@@ -75,7 +75,7 @@ class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
   @Override
   public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
-    //get activity
+    // get activity
     Activity _activity = mActivities.get(position);
 
     if (getItemViewType(position) == -1) { // type row
