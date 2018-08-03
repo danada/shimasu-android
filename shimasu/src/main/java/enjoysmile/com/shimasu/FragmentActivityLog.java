@@ -60,9 +60,13 @@ public class FragmentActivityLog extends DialogFragment
 
     // get activities
     RealmResults<Activity> activityResult =
-        realm.where(Activity.class).sort("type", Sort.ASCENDING).findAll();
-    mActivityData = new RealmList<>();
-    mActivityData.addAll(activityResult);
+        realm
+            .where(Activity.class)
+            .equalTo("deleted", false)
+            .sort("type", Sort.ASCENDING)
+            .findAll();
+    RealmList<Activity> activityData = new RealmList<>();
+    activityData.addAll(activityResult);
 
     // build the mActivityData array
     List<String> activityNames = new ArrayList<>();
