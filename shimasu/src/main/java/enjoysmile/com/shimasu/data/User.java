@@ -1,4 +1,4 @@
-package enjoysmile.com.shimasu;
+package enjoysmile.com.shimasu.data;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

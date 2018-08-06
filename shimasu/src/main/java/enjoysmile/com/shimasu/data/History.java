@@ -1,4 +1,4 @@
-package enjoysmile.com.shimasu;
+package enjoysmile.com.shimasu.data;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -29,19 +29,19 @@ public class History extends RealmObject {
     this.activity = activity;
   }
 
-  int getQuantity() {
+  public int getQuantity() {
     return quantity;
   }
 
-  void setQuantity(int quantity) {
+  public void setQuantity(int quantity) {
     this.quantity = quantity;
   }
 
-  long getDate() {
+  public long getDate() {
     return date;
   }
 
-  void setDate(long date) {
+  public void setDate(long date) {
     this.date = date;
   }
 

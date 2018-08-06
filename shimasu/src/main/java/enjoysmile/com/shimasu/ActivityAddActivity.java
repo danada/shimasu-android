@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import enjoysmile.com.shimasu.data.Activity;
 import io.realm.Realm;
 
 public class ActivityAddActivity extends AppCompatActivity {

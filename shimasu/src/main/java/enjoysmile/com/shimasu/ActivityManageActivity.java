@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import com.github.clans.fab.FloatingActionButton;
+import enjoysmile.com.shimasu.data.Activity;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;

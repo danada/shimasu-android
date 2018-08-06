@@ -1,4 +1,4 @@
-package enjoysmile.com.shimasu;
+package enjoysmile.com.shimasu.data;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -31,11 +31,11 @@ public class Activity extends RealmObject {
     this.name = name;
   }
 
-  String getDescription() {
+  public String getDescription() {
     return description;
   }
 
-  void setDescription(String description) {
+  public void setDescription(String description) {
     this.description = description;
   }
 
@@ -55,15 +55,15 @@ public class Activity extends RealmObject {
     this.points = points;
   }
 
-  boolean isRepeatable() {
+  public boolean isRepeatable() {
     return repeatable;
   }
 
-  void setRepeatable(boolean repeatable) {
+  public void setRepeatable(boolean repeatable) {
     this.repeatable = repeatable;
   }
 
-  boolean isDeleted() {
+  public boolean isDeleted() {
     return deleted;
   }
 
