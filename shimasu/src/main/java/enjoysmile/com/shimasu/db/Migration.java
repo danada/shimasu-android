@@ -1,4 +1,4 @@
-package enjoysmile.com.shimasu;
+package enjoysmile.com.shimasu.db;
 
 import io.realm.DynamicRealm;
 import io.realm.RealmMigration;

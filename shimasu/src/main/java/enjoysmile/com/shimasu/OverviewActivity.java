@@ -33,6 +33,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import enjoysmile.com.shimasu.data.Activity;
 import enjoysmile.com.shimasu.data.History;
 import enjoysmile.com.shimasu.data.User;
+import enjoysmile.com.shimasu.db.Migration;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
