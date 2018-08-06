@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Shimasu</string>
+    <string name="point">ポイント</string>
+    <string name="point_plural">ポイント</string>
+    <string name="dialog_fragment_add_activity_activity_label">アクチブティ</string>
+    <string name="dialog_fragment_add_activity_amount_label">回数</string>
+    <string name="dialog_fragment_add_activity_point_label">ポイント</string>
+    <string name="dialog_fragment_add_activity_cancel_button">キャンセル</string>
+    <string name="overview_activity_delete_activity_cancel_button">キャンセル</string>
+    <string name="activity_add_dialog_cancel">キャンセル</string>
+    <string name="activity_delete_dialog_cancel">キャンセル</string>
+    <string name="activity_delete_dialog_delete">削除</string>
+    <string name="activity_delete_dialog_title">このアクティビティを削除しますか？</string>
+    <string name="activity_add_dialog_type">タイプ設定</string>
+    <string name="activity_add_dialog_title">ポイント設定</string>
+    <string name="menu_activity_add_save">保存</string>
+    <string name="menu_activity_add_delete">削除</string>
+    <string name="overview_activity_delete_activity_message">ログから削除しますか？</string>
+    <string name="overview_activity_delete_activity_remove_button">削除</string>
+    <string name="dialog_fragment_point_selector_can_repeat_toggle_label">反復可</string>
+    <string name="dialog_fragment_point_selector_point_value_hint">ポイント</string>
+    <string name="dialog_fragment_add_activity_log_button">追加</string>
+    <string name="dialog_fragment_add_activity_title">ログに追加</string>
+    <string name="activity_add_point_label_description">ポイント</string>
+    <string name="action_activity_manage">アクティビティ管理</string>
+    <string name="title_activity_manage">アクティビティ管理</string>
+    <string name="title_activity_add">アクティビティ追加</string>
+    <string name="activity_add_dialog_ok">決定</string>
+    <string name="activity_add_type_label_description">タイプ</string>
+    <string name="activity_add_description_hint">説明</string>
+    <string name="activity_add_name_hint">名前</string>
+
+    <string-array name="activity_types">
+        <item>アクティビティ</item>
+        <item>リワード</item>
+    </string-array>
+
+    <string-array name="activity_types_description">
+        <item>ポイントを獲得</item>
+        <item>ポイントを消費</item>
+    </string-array>
+
+    <string-array name="repeatable_description">
+        <item>一日一回</item>
+        <item>反復可</item>
+    </string-array>
+</resources>

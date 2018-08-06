@@ -77,8 +77,7 @@ public class ActivityAddActivity extends AppCompatActivity {
           public void onClick(View view) {
             AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddActivity.this);
             builder
-                // TODO: stringify.
-                .setTitle("Activity type")
+                .setTitle(R.string.activity_add_dialog_type)
                 .setSingleChoiceItems(
                     activityTypes,
                     activity.getType(),
@@ -129,11 +128,9 @@ public class ActivityAddActivity extends AppCompatActivity {
 
             builder
                 .setView(dialogView)
-                // TODO: stringify.
-                .setTitle("Activity points")
+                .setTitle(R.string.activity_add_dialog_title)
                 .setPositiveButton(
-                    // TODO: stringify.
-                    "Ok",
+                    R.string.activity_add_dialog_ok,
                     new DialogInterface.OnClickListener() {
                       @Override
                       public void onClick(DialogInterface dialog, int id) {
@@ -154,8 +151,7 @@ public class ActivityAddActivity extends AppCompatActivity {
                       }
                     })
                 .setNegativeButton(
-                    // TODO: stringify.
-                    "Cancel",
+                    R.string.activity_add_dialog_cancel,
                     new DialogInterface.OnClickListener() {
                       public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
@@ -238,10 +234,9 @@ public class ActivityAddActivity extends AppCompatActivity {
     if (id == R.id.action_activity_delete) {
       AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddActivity.this);
       builder
-          // TODO: stringify.
-          .setMessage("Delete this activity?")
+          .setMessage(R.string.activity_delete_dialog_title)
           .setPositiveButton(
-              "Erase",
+              R.string.activity_delete_dialog_delete,
               new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
@@ -263,8 +258,7 @@ public class ActivityAddActivity extends AppCompatActivity {
                 }
               })
           .setNegativeButton(
-              // TODO: stringify.
-              "Cancel",
+              R.string.activity_delete_dialog_cancel,
               new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                   dialog.dismiss();

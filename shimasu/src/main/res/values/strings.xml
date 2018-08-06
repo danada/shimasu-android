@@ -1,25 +1,32 @@
 <resources>
-    <string name="app_name">Shimasu</string>
+    <string name="app_name" translatable="false">Shimasu</string>
     <string name="action_activity_manage">Manage Activities</string>
     <string name="title_activity_manage">Manage Activities</string>
     <string name="title_activity_add">Add Activity</string>
     <string name="point">point</string>
     <string name="point_plural">points</string>
-    <string name="activity_point_label">▲ %1$d</string>
-    <string name="reward_point_label">▼ %1$d</string>
+    <string name="activity_point_label" translatable="false">▲ %1$d</string>
+    <string name="reward_point_label" translatable="false">▼ %1$d</string>
 
     <!-- activity_add -->
     <string name="activity_add_name_hint">Name</string>
+    <string name="activity_add_dialog_title">Activity points</string>
+    <string name="activity_add_dialog_ok">OK</string>
+    <string name="activity_add_dialog_cancel">Cancel</string>
+    <string name="activity_add_dialog_type">Activity type</string>
     <string name="activity_add_description_hint">Description</string>
     <string name="activity_add_type_label_description">Type</string>
     <string name="activity_add_point_label_description">Points</string>
-    <string name="activity_add_point_amount_label">%d %s</string>
+    <string name="activity_add_point_amount_label" translatable="false">%d %s</string>
+    <string name="activity_delete_dialog_title">Delete this activity?</string>
+    <string name="activity_delete_dialog_delete">Erase</string>
+    <string name="activity_delete_dialog_cancel">Cancel</string>
 
     <!-- dialog_fragment_add_activity -->
     <string name="dialog_fragment_add_activity_activity_label">Activity</string>
     <string name="dialog_fragment_add_activity_amount_label">Amount</string>
-    <string name="dialog_fragment_add_activity_amount_decrease_button">-</string>
-    <string name="dialog_fragment_add_activity_amount_increase_button">+</string>
+    <string name="dialog_fragment_add_activity_amount_decrease_button" translatable="false">-</string>
+    <string name="dialog_fragment_add_activity_amount_increase_button" translatable="false">+</string>
     <string name="dialog_fragment_add_activity_point_label">Points</string>
     <string name="dialog_fragment_add_activity_log_button">Log</string>
     <string name="dialog_fragment_add_activity_cancel_button">Cancel</string>
@@ -35,10 +42,10 @@
     <string name="overview_activity_delete_activity_cancel_button">Cancel</string>
 
     <!-- history_view -->
-    <string name="history_view_activity_icon_description">Activity Icon</string>
+    <string name="history_view_activity_icon_description" translatable="false">Activity Icon</string>
 
     <!-- history_row -->
-    <string name="history_row_point_amount_label">%s x %d</string>
+    <string name="history_row_point_amount_label" translatable="false">%s x %d</string>
 
     <!-- menu_activity_add -->
     <string name="menu_activity_add_save">Save</string>
