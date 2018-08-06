@@ -84,12 +84,18 @@ public class ActivityAddActivity extends AppCompatActivity {
                     activity.getType(),
                     new DialogInterface.OnClickListener() { // default is activity
                       public void onClick(DialogInterface dialog, int item) {
+                        Realm.init(getApplicationContext());
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+
                         // set activity types
                         activity.setType(item);
 
                         // reconfigure activity type selector
                         configureActivityType();
 
+                        realm.commitTransaction();
+                        realm.close();
                         dialog.dismiss();
                       }
                     });
@@ -131,6 +137,10 @@ public class ActivityAddActivity extends AppCompatActivity {
                     new DialogInterface.OnClickListener() {
                       @Override
                       public void onClick(DialogInterface dialog, int id) {
+                        Realm.init(getApplicationContext());
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+
                         // update the activity with these selections
                         activity.setPoints(Integer.parseInt(pointValue.getText().toString()));
                         activity.setRepeatable(canRepeat.isChecked());
@@ -138,6 +148,8 @@ public class ActivityAddActivity extends AppCompatActivity {
                         // reconfigure activity points selector
                         configureActivityPoints();
 
+                        realm.commitTransaction();
+                        realm.close();
                         dialog.dismiss();
                       }
                     })
