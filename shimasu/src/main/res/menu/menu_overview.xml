@@ -1,9 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="enjoysmile.com.shimasu.OverviewActivity">
     <item
         android:id="@+id/action_activity_manage"
         android:orderInCategory="100"
         android:title="@string/action_activity_manage"
-        android:showAsAction="never"/>
+        app:showAsAction="never"/>
 </menu>
