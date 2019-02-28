@@ -53,29 +53,10 @@ public class OverviewActivity extends AppCompatActivity
   private FloatingActionMenu mFloatingActionMenu;
 
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_overview);
-    Toolbar toolbar = findViewById(R.id.toolbar);
-    setSupportActionBar(toolbar);
+  protected void onResume() {
+    super.onResume();
 
-    // recycler view
-    mActivityRecyclerView = findViewById(R.id.activity_recycler_view);
-    // use a linear layout manager
-    final RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
-    mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
-
-    Realm.init(this);
-    RealmConfiguration config =
-        new RealmConfiguration.Builder().schemaVersion(1).migration(new Migration()).build();
-    Realm.setDefaultConfiguration(config);
-    realm = Realm.getDefaultInstance();
-
-    // initiate user
-    mUser = initializeUser();
-    updateUserPoints(0);
-
-    // get activities
+    // build floating action menu
     RealmResults<Activity> activityResult =
         realm
             .where(Activity.class)
@@ -85,18 +66,8 @@ public class OverviewActivity extends AppCompatActivity
     RealmList<Activity> activityData = new RealmList<>();
     activityData.addAll(activityResult);
 
-    mActivityAdapter = new HistoryAdapter(mHistoryData, this);
-    mActivityRecyclerView.setAdapter(mActivityAdapter);
-
-    // Get history and add it to the history list.
-    RealmResults<History> historyResult =
-        realm.where(History.class).sort("date", Sort.ASCENDING).findAll();
-    for (History history : historyResult) {
-      addHistory(history);
-    }
-
-    // build floating action menu
     mFloatingActionMenu = findViewById(R.id.multiple_actions);
+    mFloatingActionMenu.removeAllMenuButtons();
 
     for (Activity activity : activityData) {
       FloatingActionButton fab = new FloatingActionButton(getBaseContext());
@@ -131,6 +102,40 @@ public class OverviewActivity extends AppCompatActivity
 
       // add the button
       mFloatingActionMenu.addMenuButton(fab);
+    }
+  }
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_overview);
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
+    // recycler view
+    mActivityRecyclerView = findViewById(R.id.activity_recycler_view);
+    // use a linear layout manager
+    final RecyclerView.LayoutManager mActivityLayoutManager = new LinearLayoutManager(this);
+    mActivityRecyclerView.setLayoutManager(mActivityLayoutManager);
+
+    Realm.init(this);
+    RealmConfiguration config =
+        new RealmConfiguration.Builder().schemaVersion(1).migration(new Migration()).build();
+    Realm.setDefaultConfiguration(config);
+    realm = Realm.getDefaultInstance();
+
+    // initiate user
+    mUser = initializeUser();
+    updateUserPoints(0);
+
+    mActivityAdapter = new HistoryAdapter(mHistoryData, this);
+    mActivityRecyclerView.setAdapter(mActivityAdapter);
+
+    // Get history and add it to the history list.
+    RealmResults<History> historyResult =
+        realm.where(History.class).sort("date", Sort.ASCENDING).findAll();
+    for (History history : historyResult) {
+      addHistory(history);
     }
 
     // hide and show the floating menu
@@ -309,7 +314,7 @@ public class OverviewActivity extends AppCompatActivity
     Canvas canvas = new Canvas(bitmap);
     int yPos = (int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2));
 
-    canvas.drawText(text, canvas.getWidth() / 2, yPos, paint);
+    canvas.drawText(text, (float) canvas.getWidth() / 2, yPos, paint);
     return new BitmapDrawable(getResources(), bitmap);
   }
 
